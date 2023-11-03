@@ -79,24 +79,16 @@ display_game(GameState) :-
     write('Tabuleiro:'), nl,
     print_board(GameState), % Predicado para imprimir o tabuleiro
     nl,
-    write('Próximo jogador: '), write(GameState), nl.
+    show_current_player.
 
-% Exemplo de implementação para obter uma lista de jogadas válidas
-valid_moves(GameState, ListOfMoves) :-
-    % Implementação para gerar uma lista de movimentos válidos
-    % Certifique-se de que ListOfMoves contenha uma lista de jogadas válidas.
-    % ...
+% Predicado para obter uma lista de jogadas válidas (ainda não implementado)
+valid_moves(_, []).
 
-% Exemplo de implementação para verificar o fim do jogo e determinar o vencedor
-check_winner(GameState, Winner) :-
-    % Implementação para verificar se o jogo terminou e determinar o vencedor
-    % O vencedor deve ser unificado com o átomo 'player1' ou 'player2' ou 'draw' caso haja empate.
-    % ...
+% Predicado para verificar o fim do jogo e determinar o vencedor (ainda não implementado)
+check_winner(_, _).
 
-% Exemplo de implementação para avaliar o estado do jogo
-value(GameState, Player, Value) :-
-    % Implementação para calcular a pontuação de um estado de jogo
-    % Certifique-se de definir Value com a pont
+% Predicado para avaliar o estado do jogo (ainda não implementado)
+value(_, _, 0).
 
 % Predicado para exibir o menu principal
 main_menu :-
@@ -164,4 +156,5 @@ get_current_player(Player) :-
 show_current_player :-
     get_current_player(Player),
     player(Player, Color),
-    write('É a vez de '), write(Player), write(' ('), write(Color), write(')'), nl.
+    format('É a vez de ~w (~w)~n', [Player, Color]).
+
