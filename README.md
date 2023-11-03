@@ -4,8 +4,8 @@
 
 Grupo Wald Meister_1
 
-- André dos Santos Faria Relva (202108695) - 50%
-- Rui Pedro Almeida da Silveira (202108878) - 50%
+- André dos Santos Faria Relva (up202108695) - 50%
+- Rui Pedro Almeida da Silveira (up202108878) - 50%
 
 ## Jogo escolhido
 
