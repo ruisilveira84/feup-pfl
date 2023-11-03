@@ -135,3 +135,33 @@ show_credits :-
     write('0. Voltar ao Menu Principal'), nl,
     write('Escolha uma opção: '),
     read_option.
+
+% Definição de fatos e regras adicionais
+:- dynamic current_player/1.
+
+% Inicia o jogo
+start_game :-
+    write('Bem-vindo ao jogo!'), nl,
+    initialize_players,
+    set_current_player(player1),
+    play.
+
+% Inicializa os jogadores
+initialize_players :-
+    assertz(player('player1', verde_claro)),
+    assertz(player('player2', amarelo)).
+
+% Define o jogador atual
+set_current_player(Player) :-
+    retractall(current_player(_)),
+    assertz(current_player(Player)).
+
+% Obtém o jogador atual
+get_current_player(Player) :-
+    current_player(Player).
+
+% Mostra o jogador atual
+show_current_player :-
+    get_current_player(Player),
+    player(Player, Color),
+    write('É a vez de '), write(Player), write(' ('), write(Color), write(')'), nl.
