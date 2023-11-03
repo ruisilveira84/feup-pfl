@@ -1,5 +1,3 @@
-% Definição de fatos e regras
-
 % Define os jogadores
 players([player1, player2]).
 
@@ -115,18 +113,8 @@ read_option :-
 % Predicado para iniciar um novo jogo (como anteriormente)
 start_new_game :-
     write('A iniciar um novo jogo...'), nl,
-    play,
-    main_menu.
-
-% Predicado para exibir os créditos
-show_credits :-
-    write('----- Créditos -----'), nl,
-    write('André dos Santos Faria Relva (up202108695)'), nl,
-    write('Rui Pedro Almeida da Silveira (up202108878)'), nl,
-    write('FEUP'), nl,
-    write('0. Voltar ao Menu Principal'), nl,
-    write('Escolha uma opção: '),
-    read_option.
+    initialize_players,
+    play.
 
 % Definição de fatos e regras adicionais
 :- dynamic current_player/1.
@@ -153,8 +141,9 @@ get_current_player(Player) :-
     current_player(Player).
 
 % Mostra o jogador atual
-show_current_player :-
+show_current_player :- 
     get_current_player(Player),
     player(Player, Color),
     format('É a vez de ~w (~w)~n', [Player, Color]).
+
 
