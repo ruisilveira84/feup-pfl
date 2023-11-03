@@ -142,8 +142,7 @@ get_current_player(Player) :-
 
 % Mostra o jogador atual
 show_current_player :- 
-    get_current_player(Player),
-    player(Player, Color),
-    format('É a vez de ~w (~w)~n', [Player, Color]).
-
+    get_current_player(Player), 
+    player(Player, Color), 
+    write('Jogador '), write(Player), write(' a '), write(Color), nl.
 
