@@ -72,3 +72,28 @@ count_combination_helper(Height, Color, [(H, C)|Rest], Acc, Count) :-
 
 % Exemplo de uso:
 % ?- initial_state(State), move(State, (medio, verde_claro), (alto, verde_escuro), NewState).
+
+% Exemplo de implementação do predicado de visualização
+display_game(GameState) :-
+    % Implementação para exibir o tabuleiro e informações do jogo
+    write('Tabuleiro:'), nl,
+    print_board(GameState), % Predicado para imprimir o tabuleiro
+    nl,
+    write('Próximo jogador: '), write(GameState), nl.
+
+% Exemplo de implementação para obter uma lista de jogadas válidas
+valid_moves(GameState, ListOfMoves) :-
+    % Implementação para gerar uma lista de movimentos válidos
+    % Certifique-se de que ListOfMoves contenha uma lista de jogadas válidas.
+    % ...
+
+% Exemplo de implementação para verificar o fim do jogo e determinar o vencedor
+check_winner(GameState, Winner) :-
+    % Implementação para verificar se o jogo terminou e determinar o vencedor
+    % O vencedor deve ser unificado com o átomo 'player1' ou 'player2' ou 'draw' caso haja empate.
+    % ...
+
+% Exemplo de implementação para avaliar o estado do jogo
+value(GameState, Player, Value) :-
+    % Implementação para calcular a pontuação de um estado de jogo
+    % Certifique-se de definir Value com a pont
