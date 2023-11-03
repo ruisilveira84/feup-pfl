@@ -26,9 +26,6 @@ O predicado `play/0` inicia a aplicação.
 O WaldMeister é um jogo de tabuleiro para 2 jogadores que desejam moldar uma floresta de acordo com seus objetivos. Cada jogador começa com 27 árvores, com diferentes alturas e cores. Os jogadores movem e colocam, à vez, as árvores no tabuleiro, com um jogador tentando criar grupos de acordo com a altura e o outro tentando criar grupos de acordo com a cor.
 
 O objetivo é criar grupos de árvores de acordo com as regras específicas do jogo, e o jogador com a soma mais alta de grupos vence.
-rui@PCofRUI:~/Desktop$ git push -u origin main
-
- estado do jogo
 
 O estado do jogo é representado por um par (Tabuleiro-Jogador), onde o Tabuleiro é uma lista de listas que representa o tabuleiro de jogo e o Jogador indica qual jogador está no turno.
 
