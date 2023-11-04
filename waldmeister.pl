@@ -89,9 +89,8 @@ value([_, State, _], Player, Value) :-
 
 % Exemplo de implementação do predicado de visualização
 display_game(GameState) :-
-    % Implementação para exibir o tabuleiro e informações do jogo
-    write('Board:'), nl,
     print_board(GameState), % Predicado para imprimir o tabuleiro
+    print_legend, % Predicado para imprimir a legenda
     nl,
     show_current_player.
 
@@ -163,8 +162,8 @@ start_game :-
 
 % Inicializa os jogadores
 initialize_players :-
-    assertz(player('player1', verde_claro)),
-    assertz(player('player2', amarelo)).
+    assertz(player('player1')),
+    assertz(player('player2')).
 
 % Define o jogador atual
 set_current_player(Player) :-
@@ -178,8 +177,7 @@ get_current_player(Player) :-
 % Mostra o jogador atual
 show_current_player :- 
     get_current_player(Player), 
-    player(Player, Color), 
-    write('Player '), write(Player), write(' a '), write(Color), nl.
+    write('Current Player: '), write(Player), nl.
 
 % Predicado para fazer um movimento no jogo
 make_move(GameState, NewGameState) :-
@@ -241,8 +239,26 @@ print_rows([Row|Rest]) :-
     print_rows(Rest).
 
 % Predicado auxiliar para imprimir uma linha do tabuleiro
-print_row([]) :- nl.
+print_row([]) :- 
+    write('|'),
+    nl.
 print_row([(Height, Color)|Rest]) :-
-    write('['), write(Height), write(' '), write(Color), write('] '),
+    write('| '), write_height_color(Height, Color),
     print_row(Rest).
 
+% Predicado para imprimir a altura e cor de uma árvore
+write_height_color(baixo, verde_claro) :- write('B(G)').
+write_height_color(baixo, verde) :- write('B(_)').
+write_height_color(baixo, verde_escuro) :- write('B(B)').
+write_height_color(medio, verde_claro) :- write('M(G)').
+write_height_color(medio, verde) :- write('M(_)').
+write_height_color(medio, verde_escuro) :- write('M(B)').
+write_height_color(alto, verde_claro) :- write('S(G)').
+write_height_color(alto, verde) :- write('S(_)').
+write_height_color(alto, verde_escuro) :- write('S(B)').
+
+% Predicado para imprimir a legenda
+print_legend :-
+    nl,
+    write('| Info: B(_) Big, M(_) Medium, S(_) Short   |'), nl,
+    write('|       _(Y) Yellow, _(G) Green, _(B) Brown |'), nl.
