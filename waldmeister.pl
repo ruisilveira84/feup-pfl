@@ -230,3 +230,19 @@ switch_player :-
     nth1(NextIndex, Players, NextPlayer),
     set_current_player(NextPlayer).
 
+% Predicado para imprimir o estado do tabuleiro
+print_board([_, State, _]) :-
+    print_rows(State).
+
+% Predicado auxiliar para imprimir as linhas do tabuleiro
+print_rows([]).
+print_rows([Row|Rest]) :-
+    print_row(Row),
+    print_rows(Rest).
+
+% Predicado auxiliar para imprimir uma linha do tabuleiro
+print_row([]) :- nl.
+print_row([(Height, Color)|Rest]) :-
+    write('['), write(Height), write(' '), write(Color), write('] '),
+    print_row(Rest).
+
