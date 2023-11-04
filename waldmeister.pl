@@ -158,7 +158,7 @@ start_new_game :-
 start_game :-
     initialize_players,
     set_current_player(player1),
-    display_game([_, _, _]), % Mostra o tabuleiro vazio no início
+    display_game([_, [], []]), % Mostra o tabuleiro vazio no início
     nl,
     make_first_move.
 
@@ -167,11 +167,10 @@ make_first_move :-
     get_current_player(Player),
     nl, write('Player '), write(Player), write(', enter your move (e.g., (row, column).): '),
     read(From),
-    read(To),
     initial_state(_, [(P1Height, P1Color), (P2Height, P2Color)]),
-    (valid_first_move(Player, From, To, [(P1Height, P1Color), (P2Height, P2Color)]) ->
+    (valid_first_move(Player, From, [(P1Height, P1Color), (P2Height, P2Color)]) ->
         % Atualiza o estado do jogo
-        move([Player, [], [(P1Height, P1Color), (P2Height, P2Color)]], (From, To), NewGameState),
+        move([Player, [], [(P1Height, P1Color), (P2Height, P2Color)]], (From, 8), NewGameState),
         display_game(NewGameState),
         set_current_player(player2), % Alterna para o próximo jogador
         ! % Sai do loop
@@ -180,10 +179,10 @@ make_first_move :-
         fail % Continua a pedir um movimento válido
     ).
 
-valid_first_move(Player, From, To, [(P1Height, P1Color), (P2Height, P2Color)]) :-
-    number(From), number(To),
-    (Player = player1, (From >= 1, From =< 7, To =:= 8 ; From =:= 8, To >= 1, To =< 7)) ;
-    (Player = player2, (From >= 9, From =< 15, To =:= 8 ; From =:= 8, To >= 9, To =< 15)).
+valid_first_move(Player, From, [(P1Height, P1Color), (P2Height, P2Color)]) :-
+    number(From),
+    (Player = player1, From >= 1, From =< 15) ;
+    (Player = player2, From >= 1, From =< 15).
 
 % Inicializa os jogadores
 initialize_players :-
@@ -237,9 +236,6 @@ get_player_move(ValidMoves, Move) :-
 valid_move_format(From, To, (From,To), ValidMoves) :-
     number(From), number(To),
     member((From, To), ValidMoves).
-
-
-
 
 % Predicado para coordenar o jogo
 play :-
