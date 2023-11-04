@@ -27,17 +27,6 @@ move([Player, State, Reserve], From, To, NewState) :-
     append(TempReserve, [(Height, Color)], NewReserve),
     NewState = [Player, NewBoard, NewReserve].
 
-% Predicado para imprimir a altura e cor de uma árvore
-write_height_color(short, yellow_green, _) :- write('_(YG)').
-write_height_color(short, leaf_green, _) :- write('_(LG)').
-write_height_color(short, dark_green, _) :- write('_(DG)').
-write_height_color(medium, yellow_green, _) :- write('M(YG)').
-write_height_color(medium, leaf_green, _) :- write('M(LG)').
-write_height_color(medium, dark_green, _) :- write('M(DG)').
-write_height_color(tall, yellow_green, _) :- write('T(YG)').
-write_height_color(tall, leaf_green, _) :- write('T(LG)').
-write_height_color(tall, dark_green, _) :- write('T(DG)').
-
 % Predicado para verificar se um jogador venceu
 check_winner([_, State, _], Winner) :-
     count_groups(State, 1, Count1),
@@ -96,7 +85,7 @@ value([_, State, _], Player, Value) :-
     Value is PlayerGroups - OpponentGroups.
 
 % Exemplo de uso:
-% ?- initial_state(State), move(State, (medio, yellow_green), (tall, dark_green), NewState).
+% ?- initial_state(State), move(State, (medium, yellow_green), (tall, dark_green), NewState).
 
 % Exemplo de implementação do predicado de visualização
 display_game(GameState) :-
@@ -211,7 +200,11 @@ get_player_move(ValidMoves, Move) :-
     repeat,
     nl, write('Enter your move (e.g., (from, to).): '),
     read(Move),
-    member(Move, ValidMoves), !.
+    (
+        member(Move, ValidMoves) -> true
+        ;
+        write('Invalid move! Please try again.'), nl, fail
+    ).
 
 % Predicado para coordenar o jogo
 play :-
@@ -240,21 +233,33 @@ switch_player :-
 
 % Predicado para imprimir o estado do tabuleiro
 print_board([_, State, _]) :-
-    print_rows(State).
+    print_rows(State, 1).
 
 % Predicado auxiliar para imprimir as linhas do tabuleiro
-print_rows([]).
-print_rows([Row|Rest]) :-
-    print_row(Row),
-    print_rows(Rest).
+print_rows([], _).
+print_rows([Row|Rest], LineNumber) :-
+    print_line(Row, LineNumber),
+    NextLineNumber is LineNumber + 1,
+    print_rows(Rest, NextLineNumber).
 
 % Predicado auxiliar para imprimir uma linha do tabuleiro
-print_row([]) :- 
-    write('|'),
-    nl.
-print_row([(Height, Color)|Rest]) :-
-    write('| '), write_height_color(Height, Color),
-    print_row(Rest).
+print_line([], _) :- 
+    write('|'), nl.
+print_line([(Height, Color)|Rest], LineNumber) :-
+    write('| '),
+    write_height_color(Height, Color, LineNumber),
+    print_line(Rest, LineNumber).
+
+% Predicado para imprimir a altura e cor de uma árvore
+write_height_color(short, yellow_green, _) :- write('_(YG)').
+write_height_color(short, leaf_green, _) :- write('_(LG)').
+write_height_color(short, dark_green, _) :- write('_(DG)').
+write_height_color(medium, yellow_green, _) :- write('M(YG)').
+write_height_color(medium, leaf_green, _) :- write('M(LG)').
+write_height_color(medium, dark_green, _) :- write('M(DG)').
+write_height_color(tall, yellow_green, _) :- write('T(YG)').
+write_height_color(tall, leaf_green, _) :- write('T(LG)').
+write_height_color(tall, dark_green, _) :- write('T(DG)').
 
 % Predicado para imprimir a legenda
 print_legend :-
