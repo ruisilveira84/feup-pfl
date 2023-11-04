@@ -133,10 +133,13 @@ read_option :-
         ;
         Option = 2 -> show_credits, main_menu
         ;
-        Option = 3 -> nl, write('See you soon!'), nl
+        Option = 3 -> nl, write('See you soon!'), nl, wait_seconds(5), halt % Adicionado o halt/0 para encerrar o programa
         ;
         write('Invalid option.'), nl, main_menu
     ).
+
+wait_seconds(0).
+wait_seconds(N) :- N > 0, N1 is N - 1, wait_seconds(N1).
 
 % Predicado para mostrar os créditos
 show_credits :-
@@ -156,6 +159,7 @@ start_new_game :-
 
 % Predicado para iniciar o jogo
 start_game :-
+    main_menu, % Adicionado para exibir o menu principal antes de iniciar o jogo
     initialize_players,
     set_current_player(player1),
     display_game([_, [], []]), % Mostra o tabuleiro vazio no início
@@ -169,8 +173,10 @@ make_first_move :-
     read(From),
     initial_state(_, [(P1Height, P1Color), (P2Height, P2Color)]),
     (valid_first_move(Player, From, [(P1Height, P1Color), (P2Height, P2Color)]) ->
+        nl, write('Now choose the type of tree (e.g., S(YG), M(LG), T(DG)).: '),
+        read(Tree),
         % Atualiza o estado do jogo
-        move([Player, [], [(P1Height, P1Color), (P2Height, P2Color)]], (From, 8), NewGameState),
+        move([Player, [], [(P1Height, P1Color), (P2Height, P2Color)]], (From, 8), (From, Tree), NewGameState),
         display_game(NewGameState),
         set_current_player(player2), % Alterna para o próximo jogador
         ! % Sai do loop
