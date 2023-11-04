@@ -96,7 +96,7 @@ value([_, State, _], Player, Value) :-
     Value is PlayerGroups - OpponentGroups.
 
 % Exemplo de uso:
-% ?- initial_state(State), move(State, (medio, verde_claro), (alto, verde_escuro), NewState).
+% ?- initial_state(State), move(State, (medio, yellow_green), (tall, dark_green), NewState).
 
 % Exemplo de implementação do predicado de visualização
 display_game(GameState) :-
@@ -161,7 +161,6 @@ show_credits :-
 
 % Predicado para iniciar um novo jogo (como anteriormente)
 start_new_game :-
-    write('Loading...'), nl,
     initialize_players,
     play.
 
