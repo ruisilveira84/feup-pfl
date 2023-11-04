@@ -139,6 +139,7 @@ read_option :-
         write('Invalid option.'), nl, main_menu
     ).
 
+% Predicado para mostrar os créditos
 show_credits :-
     nl,
     write('----- Credits -----'), nl,
@@ -154,10 +155,7 @@ start_new_game :-
     initialize_players,
     play.
 
-% Definição de fatos e regras adicionais
-:- dynamic current_player/1.
-
-% Inicia o jogo
+% Predicado para iniciar o jogo
 start_game :-
     initialize_players,
     set_current_player(player1),
@@ -183,4 +181,52 @@ show_current_player :-
     player(Player, Color), 
     write('Player '), write(Player), write(' a '), write(Color), nl.
 
+% Predicado para fazer um movimento no jogo
+make_move(GameState, NewGameState) :-
+    display_game(GameState), % Mostra o estado atual do jogo
+
+    % Obtém a lista de movimentos válidos para o jogador atual
+    get_current_player(Player),
+    valid_moves(GameState, ValidMoves),
+
+    % Exibe os movimentos válidos disponíveis para o jogador
+    write('Valid moves: '), write(ValidMoves), nl,
+
+    % Obtém o movimento do jogador
+    get_player_move(ValidMoves, Move),
+
+    % Executa o movimento e atualiza o estado do jogo
+    move(GameState, Move, NewGameState).
+
+% Predicado para obter o movimento do jogador
+get_player_move(ValidMoves, Move) :-
+    repeat,
+    nl, write('Enter your move (e.g., (from, to).): '),
+    read(Move),
+    member(Move, ValidMoves), !.
+
+% Predicado para coordenar o jogo
+play :-
+    repeat,
+    get_current_player(Player),
+    make_move(GameState, NewGameState),
+    check_winner(NewGameState, Winner),
+    (
+        Winner \= 'Game still in progress' -> 
+            display_game(NewGameState),
+            write('Winner: '), write(Winner), nl
+        ;
+            set_current_player(Player),
+            switch_player, % Alterna para o próximo jogador
+            fail
+    ).
+
+% Predicado para alternar o jogador atual
+switch_player :-
+    get_current_player(CurrentPlayer),
+    players(Players),
+    nth1(Index, Players, CurrentPlayer),
+    NextIndex is Index mod 2 + 1,
+    nth1(NextIndex, Players, NextPlayer),
+    set_current_player(NextPlayer).
 
