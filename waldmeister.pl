@@ -2,22 +2,22 @@
 players([player1, player2]).
 
 % Define as alturas das árvores
-heights([baixo, medio, alto]).
+heights([short, medium, tall]).
 
 % Define as cores das árvores
-colors([verde_claro, verde, verde_escuro]).
+colors([yellow_green, leaf_green, dark_green]).
 
 % Define as combinações de altura e cor
-combinations([(baixo, verde_claro), (baixo, verde), (baixo, verde_escuro),
-              (medio, verde_claro), (medio, verde), (medio, verde_escuro),
-              (alto, verde_claro), (alto, verde), (alto, verde_escuro)]).
+combinations([(short, yellow_green), (short, leaf_green), (short, dark_green),
+              (medium, yellow_green), (medium, leaf_green), (medium, dark_green),
+              (tall, yellow_green), (tall, leaf_green), (tall, dark_green)]).
 
 % Inicializa o estado inicial do jogo
 initial_state([player1, player2], [(P1Height, P1Color), (P2Height, P2Color)]) :- 
-    random_member(P1Height, [baixo, medio, alto]),
-    random_member(P1Color, [verde_claro, verde, verde_escuro]),
-    random_member(P2Height, [baixo, medio, alto]),
-    random_member(P2Color, [verde_claro, verde, verde_escuro]).
+    random_member(P1Height, [short, medium, tall]),
+    random_member(P1Color, [yellow_green, leaf_green, dark_green]),
+    random_member(P2Height, [short, medium, tall]),
+    random_member(P2Color, [yellow_green, leaf_green, dark_green]).
 
 % Predicado para mover uma árvore
 move([Player, State, Reserve], From, To, NewState) :-
@@ -26,6 +26,17 @@ move([Player, State, Reserve], From, To, NewState) :-
     append(TempState, [(NewHeight, NewColor)], NewBoard),
     append(TempReserve, [(Height, Color)], NewReserve),
     NewState = [Player, NewBoard, NewReserve].
+
+% Predicado para imprimir a altura e cor de uma árvore
+write_height_color(short, yellow_green, _) :- write('_(YG)').
+write_height_color(short, leaf_green, _) :- write('_(LG)').
+write_height_color(short, dark_green, _) :- write('_(DG)').
+write_height_color(medium, yellow_green, _) :- write('M(YG)').
+write_height_color(medium, leaf_green, _) :- write('M(LG)').
+write_height_color(medium, dark_green, _) :- write('M(DG)').
+write_height_color(tall, yellow_green, _) :- write('T(YG)').
+write_height_color(tall, leaf_green, _) :- write('T(LG)').
+write_height_color(tall, dark_green, _) :- write('T(DG)').
 
 % Predicado para verificar se um jogador venceu
 check_winner([_, State, _], Winner) :-
@@ -246,19 +257,8 @@ print_row([(Height, Color)|Rest]) :-
     write('| '), write_height_color(Height, Color),
     print_row(Rest).
 
-% Predicado para imprimir a altura e cor de uma árvore
-write_height_color(baixo, verde_claro) :- write('B(G)').
-write_height_color(baixo, verde) :- write('B(_)').
-write_height_color(baixo, verde_escuro) :- write('B(B)').
-write_height_color(medio, verde_claro) :- write('M(G)').
-write_height_color(medio, verde) :- write('M(_)').
-write_height_color(medio, verde_escuro) :- write('M(B)').
-write_height_color(alto, verde_claro) :- write('S(G)').
-write_height_color(alto, verde) :- write('S(_)').
-write_height_color(alto, verde_escuro) :- write('S(B)').
-
 % Predicado para imprimir a legenda
 print_legend :-
     nl,
-    write('| Info: B(_) Big, M(_) Medium, S(_) Short   |'), nl,
-    write('|       _(Y) Yellow, _(G) Green, _(B) Brown |'), nl.
+    write('| Informations: T(__) Tall, M(__) Medium, S(__) Short    |'), nl,
+    write('| _(YG) Yellow Green, _(LG) Leaf Green, _(DG) Dark Green |'), nl.
