@@ -28,10 +28,10 @@ move([Player, State, Reserve], From, To, NewState) :-
     NewState = [Player, NewBoard, NewReserve].
 
 % Predicado para verificar se um jogador venceu
-check_winner([_, State, _], Player) :- 
-    count_groups(State, Player, Groups),
-    max_list(Groups, MaxGroups),
-    nth1(Player, Groups, MaxGroups).
+check_winner([_, State, _], Winner) :-
+    count_groups(State, 1, Count1),
+    count_groups(State, 2, Count2),
+    (Count1 > Count2 -> Winner = 1 ; Count2 > Count1 -> Winner = 2 ; Winner = 0).
 
 % Predicado para contar grupos de acordo com a altura ou cor
 count_groups(State, Player, Groups) :-
@@ -68,33 +68,62 @@ count_combination_helper(Height, Color, [(H, C)|Rest], Acc, Count) :-
     ((Height = H; Color = C) -> NextAcc is Acc + 1; NextAcc is Acc),
     count_combination_helper(Height, Color, Rest, NextAcc, Count).
 
+% Predicado para obter uma lista de jogadas válidas
+valid_moves([Player, State, Reserve], ListOfMoves) :-
+    findall((From, To), valid_move(Player, State, Reserve, From, To), ListOfMoves).
+
+% Predicado auxiliar para determinar se um movimento é válido
+valid_move(Player, State, Reserve, From, To) :-
+    member((From, Color), State),               % Pega uma árvore do tabuleiro
+    member((To, _), Reserve),                   % Pega um espaço da reserva
+    move([Player, State, Reserve], From, To, _). % Verifica se o movimento é válido
+
+% Predicado para avaliar o estado do jogo
+value([_, State, _], Player, Value) :-
+    count_groups(State, Player, PlayerGroups),
+    count_groups(State, Player, OpponentGroups),
+    Value is PlayerGroups - OpponentGroups.
+
 % Exemplo de uso:
 % ?- initial_state(State), move(State, (medio, verde_claro), (alto, verde_escuro), NewState).
 
 % Exemplo de implementação do predicado de visualização
 display_game(GameState) :-
     % Implementação para exibir o tabuleiro e informações do jogo
-    write('Tabuleiro:'), nl,
+    write('Board:'), nl,
     print_board(GameState), % Predicado para imprimir o tabuleiro
     nl,
     show_current_player.
 
-% Predicado para obter uma lista de jogadas válidas (ainda não implementado)
-valid_moves(_, []).
+% Predicado para verificar o fim do jogo e determinar o vencedor
+check_winner(GameState, Winner) :-
+    valid_moves(GameState, Moves),
+    length(Moves, NumMoves),
+    (NumMoves = 0 -> 
+        get_current_player(Player), 
+        (Player = player1 -> Opponent = player2 ; Opponent = player1),
+        value(GameState, Player, PlayerValue),
+        value(GameState, Opponent, OpponentValue),
+        (PlayerValue > OpponentValue -> Winner = Player ;
+         PlayerValue < OpponentValue -> Winner = Opponent ;
+         Winner = 'Draw')
+    ;
+    Winner = 'Game still in progress').
 
-% Predicado para verificar o fim do jogo e determinar o vencedor (ainda não implementado)
-check_winner(_, _).
-
-% Predicado para avaliar o estado do jogo (ainda não implementado)
-value(_, _, 0).
+% Predicado para avaliar o estado do jogo
+value(GameState, Player, Value) :-
+    count_groups(GameState, Player, PlayerGroups),
+    count_groups(GameState, Player, OpponentGroups),
+    Value is PlayerGroups - OpponentGroups.
 
 % Predicado para exibir o menu principal
 main_menu :-
-    write('----- Menu Principal -----'), nl,
-    write('1. Novo Jogo'), nl,
-    write('2. Créditos'), nl,
-    write('3. Sair'), nl,
-    write('Escolha uma opção: '),
+    nl,
+    write('----- WaldMeister -----'), nl,
+    write('1. New Game'), nl,
+    write('2. Credits'), nl,
+    write('3. Exit'), nl,
+    write('> '),
     read_option.
 
 % Predicado para ler a opção do jogador e agir de acordo
@@ -105,14 +134,23 @@ read_option :-
         ;
         Option = 2 -> show_credits, main_menu
         ;
-        Option = 3 -> write('Até logo!')
+        Option = 3 -> nl, write('See you soon!'), nl
         ;
-        write('Opção inválida. Tente novamente.'), nl, main_menu
+        write('Invalid option.'), nl, main_menu
     ).
+
+show_credits :-
+    nl,
+    write('----- Credits -----'), nl,
+    write('This game was created by:'), nl,
+    write('Andre Relva (up202108695)'), nl,
+    write('Rui Silveira (up202108878)'), nl,
+    write('From FEUP'), nl,
+    write('Have Fun!'), nl.
 
 % Predicado para iniciar um novo jogo (como anteriormente)
 start_new_game :-
-    write('A iniciar um novo jogo...'), nl,
+    write('Loading...'), nl,
     initialize_players,
     play.
 
@@ -121,10 +159,9 @@ start_new_game :-
 
 % Inicia o jogo
 start_game :-
-    write('Bem-vindo ao jogo!'), nl,
     initialize_players,
     set_current_player(player1),
-    play.
+    main_menu.
 
 % Inicializa os jogadores
 initialize_players :-
@@ -144,5 +181,6 @@ get_current_player(Player) :-
 show_current_player :- 
     get_current_player(Player), 
     player(Player, Color), 
-    write('Jogador '), write(Player), write(' a '), write(Color), nl.
+    write('Player '), write(Player), write(' a '), write(Color), nl.
+
 
