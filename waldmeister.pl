@@ -191,14 +191,30 @@ make_first_move :-
 
 valid_first_move(From) :-
     (   clause(trees(' ', ' ', From), true)
-    -> nl, write('Now choose the type of tree (e.g., S(YG), M(LG), T(DG)).: '),
-        read(Tree),
-        % Atualiza o estado do jogo
-        move([Player, [], [(P1Height, P1Color), (P2Height, P2Color)]], From, (From, Tree), NewGameState),
+    -> nl, write('Now choose the size of tree (e.g., s/m/t): '),
+        read(Size),        
+        valid_size(Size, From),
+
+    ; write('Invalid board espace'), nl, make_first_move
+    ).
+
+valid_size(Size, From) :-
+    (   clause(sizes(Size), true)
+    -> nl, write('Now choose the color of tree (e.g., yg/lg/dg): '),
+        read(Color),        
+        valid_color(Color, Size, From),
+
+    ; write('Invalid size'), nl, valid_first_move(From)
+    ).
+
+valid_color(Color, Size, From) :-
+    (   clause(color(Color), true)
+    -> nl, 
+
         display_game(NewGameState),
         set_current_player(player2), % Alterna para o próximo jogador
-        ! % Sai do loop
-    ; write('Invalid move'), nl, make_first_move
+
+    ; write('Invalid tree (size or color)'), nl, valid_first_move(From)
     ).
 
 % Inicializa os jogadores
@@ -345,7 +361,22 @@ set_initial :-
     assertz(trees(' ', ' ', r13_3)),
     assertz(trees(' ', ' ', r14_1)),
     assertz(trees(' ', ' ', r14_2)),
-    assertz(trees(' ', ' ', r15_1)).
+    assertz(trees(' ', ' ', r15_1)),
+    assertz(combination(s_yg)),
+    assertz(combination(m_yg)),
+    assertz(combination(t_yg)),
+    assertz(combination(s_lg)),
+    assertz(combination(m_lg)),
+    assertz(combination(t_lg)),
+    assertz(combination(s_dg)),
+    assertz(combination(m_dg)),
+    assertz(combination(t_dg)),
+    assertz(sizes(s)),
+    assertz(sizes(m)),
+    assertz(sizes(t)),
+    assertz(color(yg)),
+    assertz(color(lg)),
+    assertz(color(dg)).
 
 % Definindo o predicado para desenhar o tabuleiro com as árvores
 draw_line([]) :- nl.
