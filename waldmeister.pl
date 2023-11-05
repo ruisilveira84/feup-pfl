@@ -12,6 +12,11 @@ combinations([(short, yellow_green), (short, leaf_green), (short, dark_green),
               (medium, yellow_green), (medium, leaf_green), (medium, dark_green),
               (tall, yellow_green), (tall, leaf_green), (tall, dark_green)]).
 
+% Define as árvores no tabuleiro
+trees(yellow_green, short, r01_1).
+trees(leaf_green, medium, r02_1).
+% Adicione as outras árvores conforme necessário.
+
 % Inicializa o estado inicial do jogo
 initial_state([player1, player2], [Inventory1, Inventory2]) :- 
     combinations(AllCombinations),
@@ -33,6 +38,14 @@ check_winner([_, State, _], Winner) :-
     count_groups(State, 2, Count2),
     (Count1 > Count2 -> Winner = 1 ; Count2 > Count1 -> Winner = 2 ; Winner = 0).
 
+% Predicado para verificar o fim do jogo e determinar o vencedor
+game_over([_, State, _], Winner) :-
+    count_groups(State, 1, Player1Groups),
+    count_groups(State, 2, Player2Groups),
+    (Player1Groups > Player2Groups -> Winner = player1 ;
+     Player1Groups < Player2Groups -> Winner = player2 ;
+     Winner = 'Draw').
+
 % Predicado para contar grupos de acordo com a altura ou cor
 count_groups(State, Player, Groups) :-
     heights(Heights),
@@ -41,7 +54,7 @@ count_groups(State, Player, Groups) :-
     count_groups_helper(Heights, State, Player, HeightGroups),
     count_groups_helper(Colors, State, Player, ColorGroups),
     append(HeightGroups, ColorGroups, AllGroups),
-    length(AllGroups, Groups).
+    count_combinations(Combinations, AllGroups, Groups).
 
 count_groups_helper([], _, _, []).
 count_groups_helper([H|T], State, Player, [Count|Rest]) :-
@@ -84,13 +97,36 @@ value([_, State, _], Player, Value) :-
     count_groups(State, Player, OpponentGroups),
     Value is PlayerGroups - OpponentGroups.
 
+% Exemplo de uso:
+% ?- initial_state(State), move(State, (medium, yellow_green), (tall, dark_green), NewState).
+
+% Exemplo de implementação do predicado de visualização
+display_game(GameState) :-
+    print_board(GameState), % Predicado para imprimir o tabuleiro
+    print_legend, % Predicado para imprimir a legenda
+    nl,
+    show_current_player.
+
 % Predicado para verificar o fim do jogo e determinar o vencedor
-game_over([_, State, _], Winner) :-
-    count_groups(State, 1, Player1Groups),
-    count_groups(State, 2, Player2Groups),
-    (Player1Groups > Player2Groups -> Winner = player1 ;
-     Player1Groups < Player2Groups -> Winner = player2 ;
-     Winner = 'Draw').
+check_winner(GameState, Winner) :-
+    valid_moves(GameState, Moves),
+    length(Moves, NumMoves),
+    (NumMoves = 0 -> 
+        get_current_player(Player), 
+        (Player = player1 -> Opponent = player2 ; Opponent = player1),
+        value(GameState, Player, PlayerValue),
+        value(GameState, Opponent, OpponentValue),
+        (PlayerValue > OpponentValue -> Winner = Player ;
+         PlayerValue < OpponentValue -> Winner = Opponent ;
+         Winner = 'Draw')
+    ;
+    Winner = 'Game still in progress').
+
+% Predicado para avaliar o estado do jogo
+value(GameState, Player, Value) :-
+    count_groups(GameState, Player, PlayerGroups),
+    count_groups(GameState, Player, OpponentGroups),
+    Value is PlayerGroups - OpponentGroups.
 
 % Predicado para exibir o menu principal
 waldmeister :-
@@ -114,7 +150,6 @@ read_option :-
         ;
         write('Invalid option.'), nl, waldmeister
     ).
-
 
 wait_seconds(0).
 wait_seconds(N) :- N > 0, N1 is N - 1, wait_seconds(N1).
@@ -236,48 +271,42 @@ play :-
             fail
     ).
 
-% Predicado para alternar o jogador atual
-switch_player :-
-    get_current_player(CurrentPlayer),
-    players(Players),
-    nth1(Index, Players, CurrentPlayer),
-    NextIndex is Index mod 2 + 1,
-    nth1(NextIndex, Players, NextPlayer),
-    set_current_player(NextPlayer).
-
 % Predicado para imprimir o estado do tabuleiro
-print_board([_, State, _]) :-
-    print_rows(State, 1).
+print_board([_, _, _]) :-
+    draw_board. % Utiliza o novo predicado draw_board para imprimir o tabuleiro
 
-% Predicado auxiliar para imprimir as linhas do tabuleiro
-print_rows([], _).
-print_rows([Row|Rest], LineNumber) :-
-    print_line(Row, LineNumber),
-    NextLineNumber is LineNumber + 1,
-    print_rows(Rest, NextLineNumber).
+% Define os predicados para desenhar o tabuleiro com as árvores
+trees(yellow_green, short, r01_1).
+trees(leaf_green, medium, r02_1).
+% Adicione as outras árvores conforme necessário.
 
-% Predicado auxiliar para imprimir uma linha do tabuleiro
-print_line([], _) :- 
-    write('|'), nl.
-print_line([(Height, Color)|Rest], LineNumber) :-
-    write('| '),
-    write_height_color(Height, Color, LineNumber),
-    print_line(Rest, LineNumber).
+draw_line([]) :- nl, !.
+draw_line([H|T]) :- 
+    (H = '                            | ' -> write(H) ; 
+        trees(Color, Height, Indexboard), 
+        format('| ~w ~w |', [Color, Height])
+    ),
+    draw_line(Indexboard).
 
-% Predicado para imprimir a altura e cor de uma árvore
-write_height_color(short, yellow_green, _) :- write('_(YG)').
-write_height_color(short, leaf_green, _) :- write('_(LG)').
-write_height_color(short, dark_green, _) :- write('_(DG)').
-write_height_color(medium, yellow_green, _) :- write('M(YG)').
-write_height_color(medium, leaf_green, _) :- write('M(LG)').
-write_height_color(medium, dark_green, _) :- write('M(DG)').
-write_height_color(tall, yellow_green, _) :- write('T(YG)').
-write_height_color(tall, leaf_green, _) :- write('T(LG)').
-write_height_color(tall, dark_green, _) :- write('T(DG)').
+draw_line([H|T]) :- write(H), draw_line(T).
 
-% Predicado para imprimir a legenda
-print_legend :-
-    nl,
-    write('| Informations: T(__) Tall, M(__) Medium, S(__) Short    |'), nl,
-    write('| _(YG) Yellow Green, _(LG) Leaf Green, _(DG) Dark Green |'), nl.
+draw_board :-   nl,
+                draw_line(['                            | ', r01_1, ' |']),
+                draw_line(['                        | ', r02_1, ' | ',r02_2, ' |']),
+                draw_line(['                    | ', r03_1, ' | ',r03_2, ' | ',r03_3, ' |']),
+                draw_line(['                | ', r04_1, ' | ', r04_2, ' | ', r04_3, ' | ', r04_4, ' |']),
+                draw_line(['            | ', r05_1, ' | ', r05_2, ' | ', r05_3, ' | ', r05_4, ' | ', r05_5, ' |']),
+                draw_line(['        | ', r06_1, ' | ', r06_2, ' | ', r06_3, ' | ', r06_4, ' | ', r06_5, ' | ', r06_6, ' |']),
+                draw_line(['    | ', r07_1, ' | ', r07_2, ' | ', r07_3, ' | ', r07_4, ' | ', r07_5, ' | ', r07_6, ' | ', r70_7, ' |']),
+                draw_line(['| ', r08_1, ' | ', r08_2, ' | ', r08_3, ' | ', r08_4, ' | ', r08_5, ' | ', r08_6, ' | ', r08_7, ' | ', r08_8, ' |']),
+                draw_line(['    | ', r09_1, ' | ', r09_2, ' | ', r09_3, ' | ', r09_4, ' | ', r09_5, ' | ', r09_6, ' | ', r09_7, ' |']),
+                draw_line(['        | ', r10_1, ' | ', r10_2, ' | ', r10_3, ' | ', r10_4, ' | ', r10_5, ' | ', r10_6, ' |']),
+                draw_line(['            | ', r11_1, ' | ', r11_2, ' | ', r11_3, ' | ', r11_4, ' | ', r11_5, ' |']),
+                draw_line(['                | ', r12_1, ' | ', r12_2, ' | ', r12_3, ' | ', r12_4, ' |']),
+                draw_line(['                    | ', r13_1, ' | ', r13_2, ' | ', r13_3, ' |']),
+                draw_line(['                        | ', r14_1, ' | ', r14_2, ' |']),
+                draw_line(['                            | ', r15_1, ' |']).
+
+% Exemplo de uso:
+% ?- waldmeister.
 
