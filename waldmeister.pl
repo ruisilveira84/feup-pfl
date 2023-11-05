@@ -185,28 +185,21 @@ start_game :-
     make_first_move.
 
 make_first_move :-
-    repeat,
-    get_current_player(Player),
-    nl, write('Player '), write(Player), write(', enter your move (e.g., (row, column).): '),
+    nl, write('Enter your move (e.g. for line 3 collun 1, r03_1): '),
     read(From),
-    initial_state(_, [(P1Height, P1Color), (P2Height, P2Color)]),
-    (valid_first_move(Player, From, [(P1Height, P1Color), (P2Height, P2Color)]) ->
-        nl, write('Now choose the type of tree (e.g., S(YG), M(LG), T(DG)).: '),
+    valid_first_move(From).
+
+valid_first_move(From) :-
+    (   clause(trees(' ', ' ', From), true)
+    -> nl, write('Now choose the type of tree (e.g., S(YG), M(LG), T(DG)).: '),
         read(Tree),
         % Atualiza o estado do jogo
-        move([Player, [], [(P1Height, P1Color), (P2Height, P2Color)]], (From, 8), (From, Tree), NewGameState),
+        move([Player, [], [(P1Height, P1Color), (P2Height, P2Color)]], From, (From, Tree), NewGameState),
         display_game(NewGameState),
         set_current_player(player2), % Alterna para o próximo jogador
         ! % Sai do loop
-    ;
-        write('Invalid move! Please try again.'), nl,
-        fail % Continua a pedir um movimento válido
+    ; write('Invalid move'), nl, make_first_move
     ).
-
-valid_first_move(Player, From, [(P1Height, P1Color), (P2Height, P2Color)]) :-
-    number(From),
-    (Player = player1, From >= 1, From =< 15) ;
-    (Player = player2, From >= 1, From =< 15).
 
 % Inicializa os jogadores
 initialize_players :-
