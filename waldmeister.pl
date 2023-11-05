@@ -128,8 +128,9 @@ waldmeister :-
     nl,
     write('----- WaldMeister -----'), nl,
     write('1. New Game'), nl,
-    write('2. Credits'), nl,
-    write('3. Exit'), nl,
+    write('2. Instructions'), nl,
+    write('3. Credits'), nl,
+    write('4. Exit'), nl,
     write('> '),
     read_option.
 
@@ -137,17 +138,27 @@ waldmeister :-
 read_option :-
     read(Option),
     (
-        Option = 1 -> start_game
+        Option = 1 -> set_initial, start_game
         ;
-        Option = 2 -> show_credits, waldmeister
+        Option = 2 -> show_instructions, waldmeister
         ;
-        Option = 3 -> nl, write('See you soon!'), nl, wait_seconds(1000000), halt % Adicionado o halt/0 para encerrar o programa
+        Option = 3 -> show_credits, waldmeister
+        ;
+        Option = 4 -> nl, write('See you soon!'), nl, wait_seconds(1000000), halt % Adicionado o halt/0 para encerrar o programa
         ;
         write('Invalid option.'), nl, waldmeister
     ).
 
 wait_seconds(0).
 wait_seconds(N) :- N > 0, N1 is N - 1, wait_seconds(N1).
+
+% Predicado para mostrar as intruções
+show_instructions :-
+    nl,
+    write('----- Instructions -----'), nl,
+    write('Objective: create groups of trees with similar characteristics, such as height and color'), nl,
+    write('Winner: the player with the highest number in their group is the winner!'), nl,
+    write('Are you ready!'), nl.
 
 % Predicado para mostrar os créditos
 show_credits :-
@@ -274,7 +285,6 @@ print_legend :-
 
 % Predicado para imprimir o estado do tabuleiro
 print_board([_, _, _]) :-
-    set_initial,
     draw_board. % Utiliza o novo predicado draw_board para imprimir o tabuleiro
 
 % Definir os predicados para desenhar o tabuleiro com as árvores
