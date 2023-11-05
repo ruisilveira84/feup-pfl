@@ -141,7 +141,7 @@ read_option :-
         ;
         Option = 2 -> show_credits, waldmeister
         ;
-        Option = 3 -> nl, write('See you soon!'), nl, wait_seconds(3), halt % Adicionado o halt/0 para encerrar o programa
+        Option = 3 -> nl, write('See you soon!'), nl, wait_seconds(1000000), halt % Adicionado o halt/0 para encerrar o programa
         ;
         write('Invalid option.'), nl, waldmeister
     ).
@@ -274,84 +274,88 @@ print_legend :-
 
 % Predicado para imprimir o estado do tabuleiro
 print_board([_, _, _]) :-
+    set_initial,
     draw_board. % Utiliza o novo predicado draw_board para imprimir o tabuleiro
 
 % Definir os predicados para desenhar o tabuleiro com as árvores
-assertz(trees(' ', ' ', r01_1)).
-assertz(trees(' ', ' ', r02_1)).
-assertz(trees(' ', ' ', r02_2)).
-assertz(trees(' ', ' ', r03_1)).
-assertz(trees(' ', ' ', r03_2)).
-assertz(trees(' ', ' ', r03_3)).
-assertz(trees(' ', ' ', r04_1)).
-assertz(trees(' ', ' ', r04_2)).
-assertz(trees(' ', ' ', r04_3)).
-assertz(trees(' ', ' ', r04_4)).
-assertz(trees(' ', ' ', r05_1)).
-assertz(trees(' ', ' ', r05_2)).
-assertz(trees(' ', ' ', r05_3)).
-assertz(trees(' ', ' ', r05_4)).
-assertz(trees(' ', ' ', r05_5)).
-assertz(trees(' ', ' ', r06_1)).
-assertz(trees(' ', ' ', r06_2)).
-assertz(trees(' ', ' ', r06_3)).
-assertz(trees(' ', ' ', r06_4)).
-assertz(trees(' ', ' ', r06_5)).
-assertz(trees(' ', ' ', r06_6)).
-assertz(trees(' ', ' ', r07_1)).
-assertz(trees(' ', ' ', r07_2)).
-assertz(trees(' ', ' ', r07_3)).
-assertz(trees(' ', ' ', r07_4)).
-assertz(trees(' ', ' ', r07_5)).
-assertz(trees(' ', ' ', r07_6)).
-assertz(trees(' ', ' ', r07_7)).
-assertz(trees(' ', ' ', r08_1)).
-assertz(trees(' ', ' ', r08_2)).
-assertz(trees(' ', ' ', r08_3)).
-assertz(trees(' ', ' ', r08_4)).
-assertz(trees(' ', ' ', r08_5)).
-assertz(trees(' ', ' ', r08_6)).
-assertz(trees(' ', ' ', r08_7)).
-assertz(trees(' ', ' ', r08_8)).
-assertz(trees(' ', ' ', r09_1)).
-assertz(trees(' ', ' ', r09_2)).
-assertz(trees(' ', ' ', r09_3)).
-assertz(trees(' ', ' ', r09_4)).
-assertz(trees(' ', ' ', r09_5)).
-assertz(trees(' ', ' ', r09_6)).
-assertz(trees(' ', ' ', r09_7)).
-assertz(trees(' ', ' ', r10_1)).
-assertz(trees(' ', ' ', r10_2)).
-assertz(trees(' ', ' ', r10_3)).
-assertz(trees(' ', ' ', r10_4)).
-assertz(trees(' ', ' ', r10_5)).
-assertz(trees(' ', ' ', r10_6)).
-assertz(trees(' ', ' ', r11_1)).
-assertz(trees(' ', ' ', r11_2)).
-assertz(trees(' ', ' ', r11_3)).
-assertz(trees(' ', ' ', r11_4)).
-assertz(trees(' ', ' ', r11_5)).
-assertz(trees(' ', ' ', r12_1)).
-assertz(trees(' ', ' ', r12_2)).
-assertz(trees(' ', ' ', r12_3)).
-assertz(trees(' ', ' ', r12_4)).
-assertz(trees(' ', ' ', r13_1)).
-assertz(trees(' ', ' ', r13_2)).
-assertz(trees(' ', ' ', r13_3)).
-assertz(trees(' ', ' ', r14_1)).
-assertz(trees(' ', ' ', r14_2)).
-assertz(trees(' ', ' ', r15_1)).
+set_initial :-
+    assertz(trees(' ', ' ', r01_1)),
+    assertz(trees(' ', ' ', r02_1)),
+    assertz(trees(' ', ' ', r02_2)),
+    assertz(trees(' ', ' ', r03_1)),
+    assertz(trees(' ', ' ', r03_2)),
+    assertz(trees(' ', ' ', r03_3)),
+    assertz(trees(' ', ' ', r04_1)),
+    assertz(trees(' ', ' ', r04_2)),
+    assertz(trees(' ', ' ', r04_3)),
+    assertz(trees(' ', ' ', r04_4)),
+    assertz(trees(' ', ' ', r05_1)),
+    assertz(trees(' ', ' ', r05_2)),
+    assertz(trees(' ', ' ', r05_3)),
+    assertz(trees(' ', ' ', r05_4)),
+    assertz(trees(' ', ' ', r05_5)),
+    assertz(trees(' ', ' ', r06_1)),
+    assertz(trees(' ', ' ', r06_2)),
+    assertz(trees(' ', ' ', r06_3)),
+    assertz(trees(' ', ' ', r06_4)),
+    assertz(trees(' ', ' ', r06_5)),
+    assertz(trees(' ', ' ', r06_6)),
+    assertz(trees(' ', ' ', r07_1)),
+    assertz(trees(' ', ' ', r07_2)),
+    assertz(trees(' ', ' ', r07_3)),
+    assertz(trees(' ', ' ', r07_4)),
+    assertz(trees(' ', ' ', r07_5)),
+    assertz(trees(' ', ' ', r07_6)),
+    assertz(trees(' ', ' ', r07_7)),
+    assertz(trees(' ', ' ', r08_1)),
+    assertz(trees(' ', ' ', r08_2)),
+    assertz(trees(' ', ' ', r08_3)),
+    assertz(trees(' ', ' ', r08_4)),
+    assertz(trees(' ', ' ', r08_5)),
+    assertz(trees(' ', ' ', r08_6)),
+    assertz(trees(' ', ' ', r08_7)),
+    assertz(trees(' ', ' ', r08_8)),
+    assertz(trees(' ', ' ', r09_1)),
+    assertz(trees(' ', ' ', r09_2)),
+    assertz(trees(' ', ' ', r09_3)),
+    assertz(trees(' ', ' ', r09_4)),
+    assertz(trees(' ', ' ', r09_5)),
+    assertz(trees(' ', ' ', r09_6)),
+    assertz(trees(' ', ' ', r09_7)),
+    assertz(trees(' ', ' ', r10_1)),
+    assertz(trees(' ', ' ', r10_2)),
+    assertz(trees(' ', ' ', r10_3)),
+    assertz(trees(' ', ' ', r10_4)),
+    assertz(trees(' ', ' ', r10_5)),
+    assertz(trees(' ', ' ', r10_6)),
+    assertz(trees(' ', ' ', r11_1)),
+    assertz(trees(' ', ' ', r11_2)),
+    assertz(trees(' ', ' ', r11_3)),
+    assertz(trees(' ', ' ', r11_4)),
+    assertz(trees(' ', ' ', r11_5)),
+    assertz(trees(' ', ' ', r12_1)),
+    assertz(trees(' ', ' ', r12_2)),
+    assertz(trees(' ', ' ', r12_3)),
+    assertz(trees(' ', ' ', r12_4)),
+    assertz(trees(' ', ' ', r13_1)),
+    assertz(trees(' ', ' ', r13_2)),
+    assertz(trees(' ', ' ', r13_3)),
+    assertz(trees(' ', ' ', r14_1)),
+    assertz(trees(' ', ' ', r14_2)),
+    assertz(trees(' ', ' ', r15_1)).
 
-draw_line([]) :- nl, !.
-draw_line([H|T]) :- trees(C, H, F), !,
-                    write('('),
-                    write(C),
-                    write(' '),
-                    write(H),
-                    write(')'),
-                    draw_line(T). 
+% Definindo o predicado para desenhar o tabuleiro com as árvores
+draw_line([]) :- nl.
 
-draw_line([H|T]) :- write(H), draw_line(T).
+draw_line([Coord|Rest]) :-
+    (trees(Color, Size, Coord) -> draw_color_square(Color, Size), draw_line(Rest); write(Coord), draw_line(Rest)).
+
+draw_color_square(Color, Size) :-
+    write('('),
+    write(Color),
+    write(' '),
+    write(Size),
+    write(')').
 
 draw_board :-   nl,
                 draw_line(['                            | ', r01_1, ' |']),
@@ -360,7 +364,7 @@ draw_board :-   nl,
                 draw_line(['                | ', r04_1, ' | ', r04_2, ' | ', r04_3, ' | ', r04_4, ' |']),
                 draw_line(['            | ', r05_1, ' | ', r05_2, ' | ', r05_3, ' | ', r05_4, ' | ', r05_5, ' |']),
                 draw_line(['        | ', r06_1, ' | ', r06_2, ' | ', r06_3, ' | ', r06_4, ' | ', r06_5, ' | ', r06_6, ' |']),
-                draw_line(['    | ', r07_1, ' | ', r07_2, ' | ', r07_3, ' | ', r07_4, ' | ', r07_5, ' | ', r07_6, ' | ', r70_7, ' |']),
+                draw_line(['    | ', r07_1, ' | ', r07_2, ' | ', r07_3, ' | ', r07_4, ' | ', r07_5, ' | ', r07_6, ' | ', r07_7, ' |']),
                 draw_line(['| ', r08_1, ' | ', r08_2, ' | ', r08_3, ' | ', r08_4, ' | ', r08_5, ' | ', r08_6, ' | ', r08_7, ' | ', r08_8, ' |']),
                 draw_line(['    | ', r09_1, ' | ', r09_2, ' | ', r09_3, ' | ', r09_4, ' | ', r09_5, ' | ', r09_6, ' | ', r09_7, ' |']),
                 draw_line(['        | ', r10_1, ' | ', r10_2, ' | ', r10_3, ' | ', r10_4, ' | ', r10_5, ' | ', r10_6, ' |']),
