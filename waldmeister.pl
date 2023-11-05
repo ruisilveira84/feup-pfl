@@ -41,7 +41,7 @@ count_groups(State, Player, Groups) :-
     count_groups_helper(Heights, State, Player, HeightGroups),
     count_groups_helper(Colors, State, Player, ColorGroups),
     append(HeightGroups, ColorGroups, AllGroups),
-    count_combinations(Combinations, AllGroups, Groups).
+    length(AllGroups, Groups).
 
 count_groups_helper([], _, _, []).
 count_groups_helper([H|T], State, Player, [Count|Rest]) :-
@@ -84,36 +84,13 @@ value([_, State, _], Player, Value) :-
     count_groups(State, Player, OpponentGroups),
     Value is PlayerGroups - OpponentGroups.
 
-% Exemplo de uso:
-% ?- initial_state(State), move(State, (medium, yellow_green), (tall, dark_green), NewState).
-
-% Exemplo de implementação do predicado de visualização
-display_game(GameState) :-
-    print_board(GameState), % Predicado para imprimir o tabuleiro
-    print_legend, % Predicado para imprimir a legenda
-    nl,
-    show_current_player.
-
 % Predicado para verificar o fim do jogo e determinar o vencedor
-check_winner(GameState, Winner) :-
-    valid_moves(GameState, Moves),
-    length(Moves, NumMoves),
-    (NumMoves = 0 -> 
-        get_current_player(Player), 
-        (Player = player1 -> Opponent = player2 ; Opponent = player1),
-        value(GameState, Player, PlayerValue),
-        value(GameState, Opponent, OpponentValue),
-        (PlayerValue > OpponentValue -> Winner = Player ;
-         PlayerValue < OpponentValue -> Winner = Opponent ;
-         Winner = 'Draw')
-    ;
-    Winner = 'Game still in progress').
-
-% Predicado para avaliar o estado do jogo
-value(GameState, Player, Value) :-
-    count_groups(GameState, Player, PlayerGroups),
-    count_groups(GameState, Player, OpponentGroups),
-    Value is PlayerGroups - OpponentGroups.
+game_over([_, State, _], Winner) :-
+    count_groups(State, 1, Player1Groups),
+    count_groups(State, 2, Player2Groups),
+    (Player1Groups > Player2Groups -> Winner = player1 ;
+     Player1Groups < Player2Groups -> Winner = player2 ;
+     Winner = 'Draw').
 
 % Predicado para exibir o menu principal
 waldmeister :-
@@ -137,6 +114,7 @@ read_option :-
         ;
         write('Invalid option.'), nl, waldmeister
     ).
+
 
 wait_seconds(0).
 wait_seconds(N) :- N > 0, N1 is N - 1, wait_seconds(N1).
