@@ -13,19 +13,19 @@ combinations([(short, yellow_green), (short, leaf_green), (short, dark_green),
               (tall, yellow_green), (tall, leaf_green), (tall, dark_green)]).
 
 % Inicializa o estado inicial do jogo
-initial_state([player1, player2], [(P1Height, P1Color), (P2Height, P2Color)]) :- 
-    random_member(P1Height, [short, medium, tall]),
-    random_member(P1Color, [yellow_green, leaf_green, dark_green]),
-    random_member(P2Height, [short, medium, tall]),
-    random_member(P2Color, [yellow_green, leaf_green, dark_green]).
+initial_state([player1, player2], [Inventory1, Inventory2]) :- 
+    combinations(AllCombinations),
+    Inventory1 = AllCombinations,
+    Inventory2 = AllCombinations.
 
 % Predicado para mover uma árvore
-move([Player, State, Reserve], From, To, NewState) :-
-    select((Height, Color), State, TempState),
-    select((NewHeight, NewColor), Reserve, TempReserve),
-    append(TempState, [(NewHeight, NewColor)], NewBoard),
-    append(TempReserve, [(Height, Color)], NewReserve),
-    NewState = [Player, NewBoard, NewReserve].
+move([Player, State, [PlayerInventory, OpponentInventory]], From, To, NewState) :-
+    select((Height, Color), PlayerInventory, TempPlayerInventory),
+    select((NewHeight, NewColor), OpponentInventory, TempOpponentInventory),
+    append(State, [(NewHeight, NewColor)], NewBoard),
+    NewPlayerInventory = TempPlayerInventory,
+    NewOpponentInventory = TempOpponentInventory,
+    NewState = [Player, NewBoard, [NewPlayerInventory, NewOpponentInventory]].
 
 % Predicado para verificar se um jogador venceu
 check_winner([_, State, _], Winner) :-
@@ -116,7 +116,7 @@ value(GameState, Player, Value) :-
     Value is PlayerGroups - OpponentGroups.
 
 % Predicado para exibir o menu principal
-main_menu :-
+waldmeister :-
     nl,
     write('----- WaldMeister -----'), nl,
     write('1. New Game'), nl,
@@ -129,13 +129,13 @@ main_menu :-
 read_option :-
     read(Option),
     (
-        Option = 1 -> start_new_game
+        Option = 1 -> start_game
         ;
-        Option = 2 -> show_credits, main_menu
+        Option = 2 -> show_credits, waldmeister
         ;
-        Option = 3 -> nl, write('See you soon!'), nl, wait_seconds(5), halt % Adicionado o halt/0 para encerrar o programa
+        Option = 3 -> nl, write('See you soon!'), nl, wait_seconds(3), halt % Adicionado o halt/0 para encerrar o programa
         ;
-        write('Invalid option.'), nl, main_menu
+        write('Invalid option.'), nl, waldmeister
     ).
 
 wait_seconds(0).
@@ -159,7 +159,6 @@ start_new_game :-
 
 % Predicado para iniciar o jogo
 start_game :-
-    main_menu, % Adicionado para exibir o menu principal antes de iniciar o jogo
     initialize_players,
     set_current_player(player1),
     display_game([_, [], []]), % Mostra o tabuleiro vazio no início
@@ -303,3 +302,4 @@ print_legend :-
     nl,
     write('| Informations: T(__) Tall, M(__) Medium, S(__) Short    |'), nl,
     write('| _(YG) Yellow Green, _(LG) Leaf Green, _(DG) Dark Green |'), nl.
+
