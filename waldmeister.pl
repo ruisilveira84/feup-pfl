@@ -12,11 +12,6 @@ combinations([(short, yellow_green), (short, leaf_green), (short, dark_green),
               (medium, yellow_green), (medium, leaf_green), (medium, dark_green),
               (tall, yellow_green), (tall, leaf_green), (tall, dark_green)]).
 
-% Define as árvores no tabuleiro
-trees(yellow_green, short, r01_1).
-trees(leaf_green, medium, r02_1).
-% Adicione as outras árvores conforme necessário.
-
 % Inicializa o estado inicial do jogo
 initial_state([player1, player2], [Inventory1, Inventory2]) :- 
     combinations(AllCombinations),
@@ -219,7 +214,7 @@ get_current_player(Player) :-
 % Mostra o jogador atual
 show_current_player :- 
     get_current_player(Player), 
-    write('Current Player: '), write(Player), nl.
+    write('Current Player: '), write(Player).
 
 % Predicado para fazer um movimento no jogo
 make_move(GameState, NewGameState) :-
@@ -271,22 +266,90 @@ play :-
             fail
     ).
 
+% Predicado para imprimir a legenda
+print_legend :-
+    nl,
+    write('| Informations: T(__) Tall, M(__) Medium, S(__) Short    |'), nl,
+    write('| _(YG) Yellow Green, _(LG) Leaf Green, _(DG) Dark Green |'), nl.
+
 % Predicado para imprimir o estado do tabuleiro
 print_board([_, _, _]) :-
     draw_board. % Utiliza o novo predicado draw_board para imprimir o tabuleiro
 
-% Define os predicados para desenhar o tabuleiro com as árvores
-trees(yellow_green, short, r01_1).
-trees(leaf_green, medium, r02_1).
-% Adicione as outras árvores conforme necessário.
+% Definir os predicados para desenhar o tabuleiro com as árvores
+assertz(trees(' ', ' ', r01_1)).
+assertz(trees(' ', ' ', r02_1)).
+assertz(trees(' ', ' ', r02_2)).
+assertz(trees(' ', ' ', r03_1)).
+assertz(trees(' ', ' ', r03_2)).
+assertz(trees(' ', ' ', r03_3)).
+assertz(trees(' ', ' ', r04_1)).
+assertz(trees(' ', ' ', r04_2)).
+assertz(trees(' ', ' ', r04_3)).
+assertz(trees(' ', ' ', r04_4)).
+assertz(trees(' ', ' ', r05_1)).
+assertz(trees(' ', ' ', r05_2)).
+assertz(trees(' ', ' ', r05_3)).
+assertz(trees(' ', ' ', r05_4)).
+assertz(trees(' ', ' ', r05_5)).
+assertz(trees(' ', ' ', r06_1)).
+assertz(trees(' ', ' ', r06_2)).
+assertz(trees(' ', ' ', r06_3)).
+assertz(trees(' ', ' ', r06_4)).
+assertz(trees(' ', ' ', r06_5)).
+assertz(trees(' ', ' ', r06_6)).
+assertz(trees(' ', ' ', r07_1)).
+assertz(trees(' ', ' ', r07_2)).
+assertz(trees(' ', ' ', r07_3)).
+assertz(trees(' ', ' ', r07_4)).
+assertz(trees(' ', ' ', r07_5)).
+assertz(trees(' ', ' ', r07_6)).
+assertz(trees(' ', ' ', r07_7)).
+assertz(trees(' ', ' ', r08_1)).
+assertz(trees(' ', ' ', r08_2)).
+assertz(trees(' ', ' ', r08_3)).
+assertz(trees(' ', ' ', r08_4)).
+assertz(trees(' ', ' ', r08_5)).
+assertz(trees(' ', ' ', r08_6)).
+assertz(trees(' ', ' ', r08_7)).
+assertz(trees(' ', ' ', r08_8)).
+assertz(trees(' ', ' ', r09_1)).
+assertz(trees(' ', ' ', r09_2)).
+assertz(trees(' ', ' ', r09_3)).
+assertz(trees(' ', ' ', r09_4)).
+assertz(trees(' ', ' ', r09_5)).
+assertz(trees(' ', ' ', r09_6)).
+assertz(trees(' ', ' ', r09_7)).
+assertz(trees(' ', ' ', r10_1)).
+assertz(trees(' ', ' ', r10_2)).
+assertz(trees(' ', ' ', r10_3)).
+assertz(trees(' ', ' ', r10_4)).
+assertz(trees(' ', ' ', r10_5)).
+assertz(trees(' ', ' ', r10_6)).
+assertz(trees(' ', ' ', r11_1)).
+assertz(trees(' ', ' ', r11_2)).
+assertz(trees(' ', ' ', r11_3)).
+assertz(trees(' ', ' ', r11_4)).
+assertz(trees(' ', ' ', r11_5)).
+assertz(trees(' ', ' ', r12_1)).
+assertz(trees(' ', ' ', r12_2)).
+assertz(trees(' ', ' ', r12_3)).
+assertz(trees(' ', ' ', r12_4)).
+assertz(trees(' ', ' ', r13_1)).
+assertz(trees(' ', ' ', r13_2)).
+assertz(trees(' ', ' ', r13_3)).
+assertz(trees(' ', ' ', r14_1)).
+assertz(trees(' ', ' ', r14_2)).
+assertz(trees(' ', ' ', r15_1)).
 
 draw_line([]) :- nl, !.
-draw_line([H|T]) :- 
-    (H = '                            | ' -> write(H) ; 
-        trees(Color, Height, Indexboard), 
-        format('| ~w ~w |', [Color, Height])
-    ),
-    draw_line(Indexboard).
+draw_line([H|T]) :- trees(C, H, F), !,
+                    write('('),
+                    write(C),
+                    write(' '),
+                    write(H),
+                    write(')'),
+                    draw_line(T). 
 
 draw_line([H|T]) :- write(H), draw_line(T).
 
