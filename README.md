@@ -19,7 +19,7 @@ Para instalar o jogo, basta consultar o arquivo waldmeister.pl na pasta do proje
 
 ### Execução
 
-O predicado `play/0` inicia a aplicação.
+O predicado `play.` inicia a aplicação.
 
 ## Descrição do jogo
 
@@ -39,7 +39,7 @@ O predicado `move(+GameState, +From, +To, -NewGameState)` permite aos jogadores 
 
 ### Final do Jogo
 
-O predicado `check_winner(+GameState, -Winner)` determina o vencedor do jogo em um dado estado.
+O predicado `game_over(+GameState, -Winner)` determina o vencedor do jogo em um dado estado.
 
 ### Lista de Jogadas Válidas
 
@@ -51,7 +51,7 @@ Avaliar o estado do jogo é crucial para a tomada de decisões dos jogadores. O 
 
 ### Jogada do Computador
 
-O computador escolhe sua jogada com base em uma heurística que busca a melhor jogada no momento, maximizando a pontuação do jogador.
+O computador escolhe sua jogada de forma aleatória e com base em uma heurística que busca a melhor jogada no momento, maximizando a pontuação do jogador.
 
 ## Conclusões
 

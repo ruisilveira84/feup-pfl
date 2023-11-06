@@ -33,6 +33,10 @@ check_winner([_, State, _], Winner) :-
     count_groups(State, 2, Count2),
     (Count1 > Count2 -> Winner = 1 ; Count2 > Count1 -> Winner = 2 ; Winner = 0).
 
+
+
+
+
 % Predicado para verificar se todos os espaços estão preenchidos
 all_spaces_filled([]).
 all_spaces_filled([H|T]) :-
@@ -42,13 +46,19 @@ all_spaces_filled([H|T]) :-
 % Predicado para verificar o fim do jogo e determinar o vencedor
 game_over(Board, Winner) :-
     all_spaces_filled(Board),
-    % Lógica para determinar o vencedor (por exemplo, contando o número de árvores de cada jogador)
-    % ...
-    % Após determinar o vencedor, atribua o vencedor à variável Winner.
+    
+    
+
+
     Winner = player1. % Exemplo de atribuição do vencedor.
+    write('Game over! Winner: '), write(Winner), nl, nl, nl,
+    play. % Volta ao menu principal.
 
 % Exemplo de chamada
 % game_over(Board, Winner).
+
+
+
 
 % Predicado para contar grupos de acordo com a altura ou cor
 count_groups(State, Player, Groups) :-
@@ -315,7 +325,10 @@ valid_last_tree_move(To) :-
 
 % Predicado para verificar se não há árvores no caminho
 no_trees_in_the_way(From, To) :-
-    (
+    diagonal(DiagList), % Obtemos a lista da diagonal
+    member(DiagList, Diagonal), % Pegamos uma lista dentro da diagonal
+    list_func(DiagList, From, To). % Verificamos se não há árvores no caminho
+    /*(
         same_diagonal(From, To) % Verifica se From e To estão na mesma diagonal
     ->
         diagonal(DiagList), % Obtemos a lista da diagonal
@@ -329,7 +342,7 @@ no_trees_in_the_way(From, To) :-
     ;   % Caso contrário, a movimentação não é válida
         write('Invalid move. It must be in the same column or diagonal.'), nl,
         aux_input_move_last_tree
-    ).
+    ).*/
 
 % Função auxiliar para verificar se não há árvores no caminho
 list_func(List, From, To) :-
@@ -371,7 +384,7 @@ same_column(From, To) :-
     column(Column),
     member(From, Column),
     member(To, Column),
-    From \= To. % Verifica se From e To são diferentes para não serem o mesmo elemento.
+    From \= To. % Verifica se From e To são diferentes para não serem o mesmo elemento
 
 
 same_diagonal(From, To) :-
@@ -379,7 +392,7 @@ same_diagonal(From, To) :-
     member(DiagList, Diagonal),
     member(From, DiagList),
     member(To, DiagList),
-    From \= To. % Verifica se From e To são diferentes para não serem o mesmo elemento.
+    From \= To. % Verifica se From e To são diferentes para não serem o mesmo elemento
 
 
 
