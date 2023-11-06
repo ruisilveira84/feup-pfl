@@ -123,6 +123,10 @@ value(GameState, Player, Value) :-
     count_groups(GameState, Player, OpponentGroups),
     Value is PlayerGroups - OpponentGroups.
 
+
+
+
+
 % Predicado para exibir o menu principal
 waldmeister :-
     nl,
@@ -170,6 +174,10 @@ show_credits :-
     write('From FEUP'), nl,
     write('Have Fun!'), nl.
 
+
+
+
+
 % Predicado para iniciar o jogo
 start_game :-
     initialize_players,
@@ -210,8 +218,10 @@ valid_color(Color, Size, From) :-
 
 % Predicado para atualizar a base de dados com a nova árvore
 update_tree_database(From, Color, Size) :-
-    retract(last_tree(_, _)), % Remove o fato anterior
-    assertz(last_tree(Color, Size)), % Adiciona a nova árvore à base de dados
+    (   retract(trees(OldColor, OldSize, From)) % Remove a árvore anterior de 'From'
+    -> assertz(last_tree(OldColor, OldSize)) % Adiciona a árvore anterior em last_tree/2
+    ;   assertz(last_tree(' ', ' ')) % Se não houver árvore anterior, mantém ' ' em last_tree/2
+    ),
     assertz(trees(Color, Size, From)). % Adiciona a nova árvore à base de dados
 
 % Predicado para fazer um movimento no jogo
@@ -230,6 +240,10 @@ make_move(GameState, NewGameState) :-
 
     % Executa o movimento e atualiza o estado do jogo
     move(GameState, Move, NewGameState).
+
+
+
+
 
 % Inicializa os jogadores
 initialize_players :-
