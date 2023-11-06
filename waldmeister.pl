@@ -179,7 +179,7 @@ start_game :-
     make_first_move.
 
 make_first_move :-
-    nl, write('Enter your move (e.g. for line 3 collun 1, r03_1): '),
+    nl, write('Enter your move (e.g. for line 3 column 1, r03_1): '),
     read(From),
     valid_first_move(From).
 
@@ -188,7 +188,7 @@ valid_first_move(From) :-
     -> nl, write('Now choose the size of tree (e.g., s/m/t): '),
         read(Size),        
         valid_size(Size, From)
-    ; write('Invalid board espace'), nl, make_first_move
+    ; write('Invalid board space'), nl, make_first_move
     ).
 
 valid_size(Size, From) :-
@@ -202,10 +202,34 @@ valid_size(Size, From) :-
 valid_color(Color, Size, From) :-
     (   clause(color(Color), true)
     -> nl, 
+        update_tree_database(From, Color, Size), % Atualiza o banco de dados com a nova árvore
         display_game(NewGameState),
-        set_current_player(player2) % Altere a vírgula para um ponto final
-    ; write('Invalid tree (size or color)'), nl, valid_first_move(From)
+        set_current_player(player2)
+    ; write('Invalid color'), nl, valid_first_move(From)
     ).
+
+% Predicado para atualizar a base de dados com a nova árvore
+update_tree_database(From, Color, Size) :-
+    retract(last_tree(_, _)), % Remove o fato anterior
+    assertz(last_tree(Color, Size)), % Adiciona a nova árvore à base de dados
+    assertz(trees(Color, Size, From)). % Adiciona a nova árvore à base de dados
+
+% Predicado para fazer um movimento no jogo
+make_move(GameState, NewGameState) :-
+    display_game(GameState), % Mostra o estado atual do jogo
+
+    % Obtém a lista de movimentos válidos para o jogador atual
+    get_current_player(Player),
+    valid_moves(GameState, ValidMoves),
+
+    % Exibe os movimentos válidos disponíveis para o jogador
+    write('Valid moves: '), write(ValidMoves), nl,
+
+    % Obtém o movimento do jogador
+    get_player_move(ValidMoves, Move),
+
+    % Executa o movimento e atualiza o estado do jogo
+    move(GameState, Move, NewGameState).
 
 % Inicializa os jogadores
 initialize_players :-
@@ -366,7 +390,8 @@ set_initial :-
     assertz(sizes(t)),
     assertz(color(yg)),
     assertz(color(lg)),
-    assertz(color(dg)).
+    assertz(color(dg)),
+    assertz(last_tree(' ',' ')).
 
 % Definindo o predicado para desenhar o tabuleiro com as árvores
 draw_line([]) :- nl.
@@ -377,7 +402,6 @@ draw_line([Coord|Rest]) :-
 draw_color_square(Color, Size) :-
     write('('),
     write(Color),
-    write(' '),
     write(Size),
     write(')').
 
