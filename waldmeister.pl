@@ -185,24 +185,24 @@ start_game :-
     set_current_player(player2),
     display_game([_, [], []]), % Mostra o tabuleiro vazio no início
     nl,
-    make_move.
+    make_first_move.
 
-make_move :-
-    nl, write('Enter your move (e.g. for line 3 column 1, r03_1): '),
+make_first_move :-
+    write('Enter your move (e.g. r03_1): '),
     read(From),
     valid_first_move(From).
 
 valid_first_move(From) :-
     (   clause(trees(' ', ' ', From), true)
-    -> nl, write('Now choose the size of tree (e.g., s/m/t): '),
+    -> nl, write('Now choose the size of tree (e.g. s/m/t): '),
         read(Size),        
         valid_size(Size, From)
-    ; write('Invalid board space'), nl, make_move
+    ; write('Invalid board space'), nl, nl, make_first_move
     ).
 
 valid_size(Size, From) :-
     (   clause(sizes(Size), true)
-    -> nl, write('Now choose the color of tree (e.g., yg/lg/dg): '),
+    -> nl, write('Now choose the color of tree (e.g. yg/lg/dg): '),
         read(Color),        
         valid_color(Color, Size, From)
     ; write('Invalid size'), nl, valid_first_move(From)
@@ -213,7 +213,7 @@ valid_color(Color, Size, From) :-
     -> nl, 
         update_tree_database(From, Color, Size), % Atualiza o banco de dados com a nova árvore
         display_game(NewGameState),
-        make_move
+        choose_existing_piece
     ; write('Invalid color'), nl, valid_first_move(From)
     ).
 
@@ -224,6 +224,38 @@ update_tree_database(From, Color, Size) :-
     ;   assertz(last_tree(' ', ' ')) % Se não houver árvore anterior, mantém ' ' em last_tree/2
     ),
     assertz(trees(Color, Size, From)). % Adiciona a nova árvore à base de dados
+
+
+
+
+
+choose_existing_piece :-
+    nl, write('Choose an existing tree (e.g. r03_1): '),
+    read(From),
+    valid_move(From).
+
+valid_move(From) :-
+    (   
+        clause(trees(yg, _, From), true)
+    -> 
+        nl, write('Now choose the size of tree (e.g. s/m/t): '),
+        read(Size),        
+        valid_size(Size, From)
+    ; 
+        clause(trees(lg, _, From), true)
+    -> 
+        nl, write('Now choose the size of tree (e.g. s/m/t): '),
+        read(Size),        
+        valid_size(Size, From)
+    ; 
+        clause(trees(dg, _, From), true)
+    -> 
+        nl, write('Now choose the size of tree (e.g. s/m/t): '),
+        read(Size),        
+        valid_size(Size, From)
+    ; 
+        write('Invalid board space'), nl, choose_existing_piece
+    ).
 
 
 
