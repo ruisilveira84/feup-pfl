@@ -194,7 +194,7 @@ make_first_move :-
 
 valid_first_move(From) :-
     (   clause(trees(' ', ' ', From), true)
-    -> nl, write('Now choose the size of tree (e.g. s/m/t): '),
+    -> nl, write('Now choose the size of new tree (e.g. s/m/t): '),
         read(Size),        
         valid_size(Size, From)
     ; write('Invalid board space'), nl, nl, make_first_move
@@ -202,7 +202,7 @@ valid_first_move(From) :-
 
 valid_size(Size, From) :-
     (   clause(sizes(Size), true)
-    -> nl, write('Now choose the color of tree (e.g. yg/lg/dg): '),
+    -> nl, write('Now choose the color of new tree (e.g. yg/lg/dg): '),
         read(Color),        
         valid_color(Color, Size, From)
     ; write('Invalid size'), nl, valid_first_move(From)
@@ -211,11 +211,43 @@ valid_size(Size, From) :-
 valid_color(Color, Size, From) :-
     (   clause(color(Color), true)
     -> nl, 
-        update_tree_database(From, Color, Size), % Atualiza o banco de dados com a nova árvore
+        update_tree_database_first(From, Color, Size), % Atualiza o banco de dados com a nova árvore
         display_game(NewGameState),
         choose_existing_piece
     ; write('Invalid color'), nl, valid_first_move(From)
     ).
+
+% Predicado para atualizar a base de dados com a primeira árvore
+update_tree_database_first(From, Color, Size) :-
+    (   retract(trees(OldColor, OldSize, From)) % Remove a árvore anterior de 'From'
+    -> assertz(last_tree(OldColor, OldSize)) % Adiciona a árvore anterior em last_tree/2
+    ;   assertz(last_tree(' ', ' ')) % Se não houver árvore anterior, mantém ' ' em last_tree/2
+    ),
+    assertz(trees(Color, Size, From)). % Adiciona a nova árvore à base de dados
+
+
+
+
+
+
+valid_size_2(Size, From) :-
+    (   clause(sizes(Size), true)
+    -> nl, write('Now choose the color of new tree (e.g. yg/lg/dg): '),
+        read(Color),        
+        valid_color_2(Color, Size, From)
+    ; write('Invalid size'), nl, choose_existing_piece
+    ).
+
+valid_color_2(Color, Size, From) :-
+    (   clause(color(Color), true)
+    -> nl, 
+        update_tree_database(From, Color, Size), % Atualiza o banco de dados com a nova árvore
+        display_game(NewGameState),
+        choose_existing_piece
+    ; write('Invalid color'), nl, choose_existing_piece
+    ).
+
+
 
 
 
@@ -223,30 +255,50 @@ valid_color(Color, Size, From) :-
 % Predicado para atualizar a base de dados com a nova árvore
 update_tree_database(From, Color, Size) :-
     (   retract(trees(OldColor, OldSize, From)) % Remove a árvore anterior de 'From'
-    -> assertz(last_tree(OldColor, OldSize)) % Adiciona a árvore anterior em last_tree/2
-    ;   assertz(last_tree(' ', ' ')) % Se não houver árvore anterior, mantém ' ' em last_tree/2
+    -> assertz(last_tree(OldColor, OldSize, From)) % Adiciona a árvore anterior em last_tree/2
+    ;   assertz(last_tree(' ', ' ',' ')) % Se não houver árvore anterior, mantém ' ' em last_tree/2
     ),
     assertz(trees(Color, Size, From)), % Adiciona a nova árvore à base de dados
-    write('Enter the move of the last tree (e.g. r03_1): '),
-    read(From),
-    move_last_tree(From).
+    write('Enter the move of the present tree (e.g. r03_1): '),
+    aux_input_move_last_tree.
+
+aux_input_move_last_tree :-
+    write('Enter the move of the present tree (e.g. r03_1): '),
+    read(To),
+    move_last_tree(To).
 
 % Predicado para mover a outra árvore
-move_last_tree(From) :-
-    (   clause(trees(' ', ' ', From), true)
+move_last_tree(To) :-
+    (   clause(trees(' ', ' ', To), true)
     ->
-        last_tree(Color, Size), % Obtém a árvore de last_tree/2
-        valid_last_tree_move(From), % Verifica se o movimento é válido (apenas em colunas e diagonais)
-        retract(last_tree(_, _)), % Remove a árvore de last_tree/2
-        assertz(trees(Color, Size, From)). % Adiciona a árvore na nova posição
-    ; write('Invalid board space'), nl, nl, move_last_tree
+        valid_last_tree_move(To), % Verifica se o movimento é válido (apenas em colunas e diagonais)
+        nl,write('joao'),nl,
+        retract(last_tree(_, _, _)), % Remove a árvore de last_tree/2
+        nl,write('joao'),nl,
+        assertz(trees(Color, Size, To)), % Adiciona a árvore na nova posição
+        nl,write('joao'),nl
+    ; write('Invalid board space'), nl, nl, aux_input_move_last_tree
     ).
 
-% Predicado para verificar se o movimento é válido
-valid_last_tree_move(From) :-
-    % Defina aqui a lógica para verificar se o movimento é válido
-    % Por exemplo, se é uma coluna ou diagonal válida.
 
+
+% Predicado para verificar se o movimento é válido
+valid_last_tree_move(To) :-
+nl,write('joao'),nl,
+    last_tree(Color, Size, From), % Obtém a árvore de last_tree
+    (   same_column(From, To)
+    ;   same_diagonal(From, To)
+    ), !.
+
+same_column(From, To) :-
+    column(Column),
+    member(From, Column),
+    member(To, Column).
+
+same_diagonal(From, To) :-
+    diagonal(Diagonal),
+    member(From, Diagonal),
+    member(To, Diagonal).
 
 
 
@@ -259,21 +311,21 @@ valid_move(From) :-
     (   
         clause(trees(yg, _, From), true)
     -> 
-        nl, write('Now choose the size of tree (e.g. s/m/t): '),
+        nl, write('Now choose the size of new tree (e.g. s/m/t): '),
         read(Size),        
-        valid_size(Size, From)
+        valid_size_2(Size, From)
     ; 
         clause(trees(lg, _, From), true)
     -> 
-        nl, write('Now choose the size of tree (e.g. s/m/t): '),
+        nl, write('Now choose the size of new tree (e.g. s/m/t): '),
         read(Size),        
-        valid_size(Size, From)
+        valid_size_2(Size, From)
     ; 
         clause(trees(dg, _, From), true)
     -> 
-        nl, write('Now choose the size of tree (e.g. s/m/t): '),
+        nl, write('Now choose the size of new tree (e.g. s/m/t): '),
         read(Size),        
-        valid_size(Size, From)
+        valid_size_2(Size, From)
     ; 
         write('Invalid board space'), nl, choose_existing_piece
     ).
@@ -316,8 +368,8 @@ show_current_player :-
 % Predicado para imprimir a legenda
 print_legend :-
     nl,
-    write('| Informations: T(__) Tall, M(__) Medium, S(__) Short    |'), nl,
-    write('| _(YG) Yellow Green, _(LG) Leaf Green, _(DG) Dark Green |'), nl.
+    write('| Informations: t Tall, m Medium, s Short       |'), nl,
+    write('| yg Yellow Green, lg Leaf Green, dg Dark Green |'), nl.
 
 % Predicado para imprimir o estado do tabuleiro
 print_board([_, _, _]) :-
@@ -404,7 +456,7 @@ set_initial :-
     assertz(color(yg)),
     assertz(color(lg)),
     assertz(color(dg)),
-    assertz(last_tree(' ',' ')),
+    assertz(last_tree(' ',' ',' ')),
     assertz(player('player1')),
     assertz(player('player2')),
     assertz(diagonal([r01_1, r02_1, r03_1, r04_1, r05_1, r06_1, r07_1, r08_1])),
