@@ -170,12 +170,6 @@ show_credits :-
     write('From FEUP'), nl,
     write('Have Fun!'), nl.
 
-% Predicado para iniciar um novo jogo (como anteriormente)
-start_new_game :-
-    initialize_players,
-    print_board([_,[],[]]), % Adicionando esta linha para imprimir o tabuleiro vazio
-    play.
-
 % Predicado para iniciar o jogo
 start_game :-
     initialize_players,
@@ -193,8 +187,7 @@ valid_first_move(From) :-
     (   clause(trees(' ', ' ', From), true)
     -> nl, write('Now choose the size of tree (e.g., s/m/t): '),
         read(Size),        
-        valid_size(Size, From),
-
+        valid_size(Size, From)
     ; write('Invalid board espace'), nl, make_first_move
     ).
 
@@ -202,18 +195,15 @@ valid_size(Size, From) :-
     (   clause(sizes(Size), true)
     -> nl, write('Now choose the color of tree (e.g., yg/lg/dg): '),
         read(Color),        
-        valid_color(Color, Size, From),
-
+        valid_color(Color, Size, From)
     ; write('Invalid size'), nl, valid_first_move(From)
     ).
 
 valid_color(Color, Size, From) :-
     (   clause(color(Color), true)
     -> nl, 
-
         display_game(NewGameState),
-        set_current_player(player2), % Alterna para o próximo jogador
-
+        set_current_player(player2) % Altere a vírgula para um ponto final
     ; write('Invalid tree (size or color)'), nl, valid_first_move(From)
     ).
 
