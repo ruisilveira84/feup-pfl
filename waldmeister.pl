@@ -100,7 +100,9 @@ display_game(GameState) :-
     print_board(GameState), % Predicado para imprimir o tabuleiro
     print_legend, % Predicado para imprimir a legenda
     nl,
-    show_current_player.
+
+    switch_current_player,
+    show_current_player, nl.
 
 % Predicado para verificar o fim do jogo e determinar o vencedor
 check_winner(GameState, Winner) :-
@@ -128,7 +130,7 @@ value(GameState, Player, Value) :-
 
 
 % Predicado para exibir o menu principal
-waldmeister :-
+play :-
     nl,
     write('----- WaldMeister -----'), nl,
     write('1. New Game'), nl,
@@ -180,13 +182,12 @@ show_credits :-
 
 % Predicado para iniciar o jogo
 start_game :-
-    initialize_players,
-    set_current_player(player1),
+    set_current_player(player2),
     display_game([_, [], []]), % Mostra o tabuleiro vazio no início
     nl,
-    make_first_move.
+    make_move.
 
-make_first_move :-
+make_move :-
     nl, write('Enter your move (e.g. for line 3 column 1, r03_1): '),
     read(From),
     valid_first_move(From).
@@ -196,7 +197,7 @@ valid_first_move(From) :-
     -> nl, write('Now choose the size of tree (e.g., s/m/t): '),
         read(Size),        
         valid_size(Size, From)
-    ; write('Invalid board space'), nl, make_first_move
+    ; write('Invalid board space'), nl, make_move
     ).
 
 valid_size(Size, From) :-
@@ -212,7 +213,7 @@ valid_color(Color, Size, From) :-
     -> nl, 
         update_tree_database(From, Color, Size), % Atualiza o banco de dados com a nova árvore
         display_game(NewGameState),
-        set_current_player(player2)
+        make_move
     ; write('Invalid color'), nl, valid_first_move(From)
     ).
 
@@ -224,31 +225,15 @@ update_tree_database(From, Color, Size) :-
     ),
     assertz(trees(Color, Size, From)). % Adiciona a nova árvore à base de dados
 
-% Predicado para fazer um movimento no jogo
-make_move(GameState, NewGameState) :-
-    display_game(GameState), % Mostra o estado atual do jogo
-
-    % Obtém a lista de movimentos válidos para o jogador atual
-    get_current_player(Player),
-    valid_moves(GameState, ValidMoves),
-
-    % Exibe os movimentos válidos disponíveis para o jogador
-    write('Valid moves: '), write(ValidMoves), nl,
-
-    % Obtém o movimento do jogador
-    get_player_move(ValidMoves, Move),
-
-    % Executa o movimento e atualiza o estado do jogo
-    move(GameState, Move, NewGameState).
 
 
 
 
-
-% Inicializa os jogadores
-initialize_players :-
-    assertz(player('player1')),
-    assertz(player('player2')).
+% Predicado para alternar o jogador atual
+switch_current_player :-
+    get_current_player(CurrentPlayer),
+    (CurrentPlayer = player1 -> NewPlayer = player2 ; NewPlayer = player1),
+    set_current_player(NewPlayer).
 
 % Define o jogador atual
 set_current_player(Player) :-
@@ -264,14 +249,6 @@ show_current_player :-
     get_current_player(Player), 
     write('Current Player: '), write(Player).
 
-% Predicado para fazer um movimento no jogo
-make_move(GameState, NewGameState) :-
-    display_game(GameState), % Mostra o estado atual do jogo
-
-    % Obtém a lista de movimentos válidos para o jogador atual
-    get_current_player(Player),
-    valid_moves(GameState, ValidMoves),
-
     % Exibe os movimentos válidos disponíveis para o jogador
     write('Valid moves: '), write(ValidMoves), nl,
 
@@ -281,38 +258,7 @@ make_move(GameState, NewGameState) :-
     % Executa o movimento e atualiza o estado do jogo
     move(GameState, Move, NewGameState).
 
-% Predicado para obter o movimento do jogador
-get_player_move(ValidMoves, Move) :-
-    repeat,
-    nl, write('Enter your move (e.g., (from, to).): '),
-    read(From),
-    read(To),
-    (valid_move_format(From, To, Move, ValidMoves) ->
-        true
-    ;
-        write('Invalid move! Please try again.'), nl,
-        fail
-    ).
 
-valid_move_format(From, To, (From,To), ValidMoves) :-
-    number(From), number(To),
-    member((From, To), ValidMoves).
-
-% Predicado para coordenar o jogo
-play :-
-    repeat,
-    get_current_player(Player),
-    make_move(GameState, NewGameState),
-    check_winner(NewGameState, Winner),
-    (
-        Winner \= 'Game still in progress' -> 
-            display_game(NewGameState),
-            write('Winner: '), write(Winner), nl
-        ;
-            set_current_player(Player),
-            switch_player, % Alterna para o próximo jogador
-            fail
-    ).
 
 % Predicado para imprimir a legenda
 print_legend :-
@@ -405,7 +351,9 @@ set_initial :-
     assertz(color(yg)),
     assertz(color(lg)),
     assertz(color(dg)),
-    assertz(last_tree(' ',' ')).
+    assertz(last_tree(' ',' ')),
+    assertz(player('player1')),
+    assertz(player('player2')).
 
 % Definindo o predicado para desenhar o tabuleiro com as árvores
 draw_line([]) :- nl.
@@ -414,10 +362,18 @@ draw_line([Coord|Rest]) :-
     (trees(Color, Size, Coord) -> draw_color_square(Color, Size), draw_line(Rest); write(Coord), draw_line(Rest)).
 
 draw_color_square(Color, Size) :-
-    write('('),
-    write(Color),
-    write(Size),
-    write(')').
+    (   
+        Color = ' ' ->
+        write('( '),
+        write(Color),
+        write(Size),
+        write(')')
+    ; 
+        write('('),
+        write(Size),
+        write(Color),
+        write(')')
+    ).
 
 draw_board :-   nl,
                 draw_line(['                            | ', r01_1, ' |']),
@@ -436,6 +392,10 @@ draw_board :-   nl,
                 draw_line(['                        | ', r14_1, ' | ', r14_2, ' |']),
                 draw_line(['                            | ', r15_1, ' |']).
 
+
+
+
+
 % Exemplo de uso:
-% ?- waldmeister.
+% ?- play.
 
