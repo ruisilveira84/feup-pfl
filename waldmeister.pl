@@ -144,15 +144,15 @@ play :-
 read_option :-
     read(Option),
     (
-        Option = 1 -> set_initial, start_game
+        Option = 1 -> game_type
         ;
-        Option = 2 -> show_instructions, waldmeister
+        Option = 2 -> show_instructions, play
         ;
-        Option = 3 -> show_credits, waldmeister
+        Option = 3 -> show_credits, play
         ;
         Option = 4 -> nl, write('See you soon!'), nl, wait_seconds(1000000), halt % Adicionado o halt/0 para encerrar o programa
         ;
-        write('Invalid option.'), nl, waldmeister
+        write('Invalid option.'), nl, play
     ).
 
 wait_seconds(0).
@@ -175,6 +175,25 @@ show_credits :-
     write('Rui Silveira (up202108878)'), nl,
     write('From FEUP'), nl,
     write('Have Fun!'), nl.
+
+% Predicado para mostrar os créditos
+game_type :-
+    write('----- Game Type -----'), nl,
+    write('1. Player vs Player'), nl,
+    write('2. Player vs Computer'), nl,
+    write('> '),
+    read_option_game_type.
+
+% Predicado para ler a opção do jogador e agir de acordo
+read_option_game_type :-
+    read(Option),
+    (
+        Option = 1 -> set_initial, start_game
+        ;
+        Option = 2 -> play
+        ;
+        write('Invalid option.'), nl, game_type
+    ).
 
 
 
@@ -259,7 +278,6 @@ update_tree_database(From, Color, Size) :-
     ;   assertz(last_tree(' ', ' ',' ')) % Se não houver árvore anterior, mantém ' ' em last_tree/2
     ),
     assertz(trees(Color, Size, From)), % Adiciona a nova árvore à base de dados
-    write('Enter the move of the present tree (e.g. r03_1): '),
     aux_input_move_last_tree.
 
 aux_input_move_last_tree :-
@@ -284,20 +302,29 @@ move_last_tree(To) :-
 
 % Predicado para verificar se o movimento é válido
 valid_last_tree_move(To) :-
-nl,write('joao'),nl,
     last_tree(Color, Size, From), % Obtém a árvore de last_tree
     (   same_column(From, To)
+    ->
+
     ;   same_diagonal(From, To)
+    ->
+
     ), !.
 
 same_column(From, To) :-
+    nl,write('joao'),nl,
     column(Column),
+    nl,write('joao'),nl,
     member(From, Column),
+    nl,write('joao'),nl,
     member(To, Column).
 
 same_diagonal(From, To) :-
+    nl,write('oi'),nl,
     diagonal(Diagonal),
+    nl,write('oi'),nl,
     member(From, Diagonal),
+    nl,write('oi'),nl,
     member(To, Diagonal).
 
 
