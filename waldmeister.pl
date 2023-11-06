@@ -217,14 +217,35 @@ valid_color(Color, Size, From) :-
     ; write('Invalid color'), nl, valid_first_move(From)
     ).
 
+
+
+
 % Predicado para atualizar a base de dados com a nova árvore
 update_tree_database(From, Color, Size) :-
     (   retract(trees(OldColor, OldSize, From)) % Remove a árvore anterior de 'From'
     -> assertz(last_tree(OldColor, OldSize)) % Adiciona a árvore anterior em last_tree/2
     ;   assertz(last_tree(' ', ' ')) % Se não houver árvore anterior, mantém ' ' em last_tree/2
     ),
-    assertz(trees(Color, Size, From)). % Adiciona a nova árvore à base de dados
+    assertz(trees(Color, Size, From)), % Adiciona a nova árvore à base de dados
+    write('Enter the move of the last tree (e.g. r03_1): '),
+    read(From),
+    move_last_tree(From).
 
+% Predicado para mover a outra árvore
+move_last_tree(From) :-
+    (   clause(trees(' ', ' ', From), true)
+    ->
+        last_tree(Color, Size), % Obtém a árvore de last_tree/2
+        valid_last_tree_move(From), % Verifica se o movimento é válido (apenas em colunas e diagonais)
+        retract(last_tree(_, _)), % Remove a árvore de last_tree/2
+        assertz(trees(Color, Size, From)). % Adiciona a árvore na nova posição
+    ; write('Invalid board space'), nl, nl, move_last_tree
+    ).
+
+% Predicado para verificar se o movimento é válido
+valid_last_tree_move(From) :-
+    % Defina aqui a lógica para verificar se o movimento é válido
+    % Por exemplo, se é uma coluna ou diagonal válida.
 
 
 
