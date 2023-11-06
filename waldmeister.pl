@@ -33,13 +33,22 @@ check_winner([_, State, _], Winner) :-
     count_groups(State, 2, Count2),
     (Count1 > Count2 -> Winner = 1 ; Count2 > Count1 -> Winner = 2 ; Winner = 0).
 
+% Predicado para verificar se todos os espaços estão preenchidos
+all_spaces_filled([]).
+all_spaces_filled([H|T]) :-
+    \+ clause(trees(' ', ' ', H), true),
+    all_spaces_filled(T).
+
 % Predicado para verificar o fim do jogo e determinar o vencedor
-game_over([_, State, _], Winner) :-
-    count_groups(State, 1, Player1Groups),
-    count_groups(State, 2, Player2Groups),
-    (Player1Groups > Player2Groups -> Winner = player1 ;
-     Player1Groups < Player2Groups -> Winner = player2 ;
-     Winner = 'Draw').
+game_over(Board, Winner) :-
+    all_spaces_filled(Board),
+    % Lógica para determinar o vencedor (por exemplo, contando o número de árvores de cada jogador)
+    % ...
+    % Após determinar o vencedor, atribua o vencedor à variável Winner.
+    Winner = player1. % Exemplo de atribuição do vencedor.
+
+% Exemplo de chamada
+% game_over(Board, Winner).
 
 % Predicado para contar grupos de acordo com a altura ou cor
 count_groups(State, Player, Groups) :-
@@ -280,6 +289,8 @@ update_tree_database(From, Color, Size) :-
     assertz(trees(Color, Size, From)), % Adiciona a nova árvore à base de dados
     aux_input_move_last_tree.
 
+
+
 aux_input_move_last_tree :-
     write('Enter the move of the present tree (e.g. r03_1): '),
     read(To),
@@ -290,11 +301,8 @@ move_last_tree(To) :-
     (   clause(trees(' ', ' ', To), true)
     ->
         valid_last_tree_move(To), % Verifica se o movimento é válido (apenas em colunas e diagonais)
-        nl,write('joao'),nl,
         retract(last_tree(_, _, _)), % Remove a árvore de last_tree/2
-        nl,write('joao'),nl,
-        assertz(trees(Color, Size, To)), % Adiciona a árvore na nova posição
-        nl,write('joao'),nl
+        assertz(trees(Color, Size, To)) % Adiciona a árvore na nova posição
     ; write('Invalid board space'), nl, nl, aux_input_move_last_tree
     ).
 
@@ -303,29 +311,76 @@ move_last_tree(To) :-
 % Predicado para verificar se o movimento é válido
 valid_last_tree_move(To) :-
     last_tree(Color, Size, From), % Obtém a árvore de last_tree
-    (   same_column(From, To)
-    ->
+    no_trees_in_the_way(From, To).
 
-    ;   same_diagonal(From, To)
+% Predicado para verificar se não há árvores no caminho
+no_trees_in_the_way(From, To) :-
+    (
+        same_diagonal(From, To) % Verifica se From e To estão na mesma diagonal
     ->
+        diagonal(DiagList), % Obtemos a lista da diagonal
+        member(DiagList, Diagonal), % Pegamos uma lista dentro da diagonal
+        list_func(DiagList, From, To) % Verificamos se não há árvores no caminho
+    ;   
+        same_column(From, To) % Se não estiverem na mesma diagonal, verificamos se estão na mesma coluna
+    ->
+        column(Column),
+        list_func(Column, From, To) % Verificamos se não há árvores no caminho
+    ;   % Caso contrário, a movimentação não é válida
+        write('Invalid move. It must be in the same column or diagonal.'), nl,
+        aux_input_move_last_tree
+    ).
 
-    ), !.
+% Função auxiliar para verificar se não há árvores no caminho
+list_func(List, From, To) :-
+    read_list(List, From, To).
+
+read_list([H|T], From, To) :-
+    (   
+        H = From ->
+        check_list(T, To)
+    ; 
+        H = To ->
+        check_list(T, From)
+    ; 
+        read_list(T, From, To)
+    ).
+
+check_list([H|T], K) :-
+    (   
+        clause(trees(' ', ' ', H), true)
+    ->
+        (   
+            H = K
+        ->
+            write('work')
+        ; 
+            check_list(T, K) 
+        )
+    ; 
+        write('Invalid move, tree in the way'), nl
+    ).
+check_list([], _).
+
+
+
+
+
 
 same_column(From, To) :-
-    nl,write('joao'),nl,
     column(Column),
-    nl,write('joao'),nl,
     member(From, Column),
-    nl,write('joao'),nl,
-    member(To, Column).
+    member(To, Column),
+    From \= To. % Verifica se From e To são diferentes para não serem o mesmo elemento.
+
 
 same_diagonal(From, To) :-
-    nl,write('oi'),nl,
     diagonal(Diagonal),
-    nl,write('oi'),nl,
-    member(From, Diagonal),
-    nl,write('oi'),nl,
-    member(To, Diagonal).
+    member(DiagList, Diagonal),
+    member(From, DiagList),
+    member(To, DiagList),
+    From \= To. % Verifica se From e To são diferentes para não serem o mesmo elemento.
+
 
 
 
