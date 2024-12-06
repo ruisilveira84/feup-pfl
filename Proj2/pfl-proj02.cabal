@@ -1,0 +1,39 @@
+cabal-version:       >=1.10
+
+name:                pfl-proj02
+version:             0.1.0.0
+-- synopsis:
+-- description:
+-- bug-reports:
+-- license:
+-- license-file:        LICENSE
+author:              André Relva, Rui Silveira
+maintainer:          up202108695@up.pt
+-- copyright:
+-- category:
+build-type:          Simple
+extra-source-files:  CHANGELOG.md, README.md
+
+executable Assembler
+  hs-source-dirs:      src
+  main-is:             Assembler.hs
+  ghc-options:         -dynamic
+  build-depends:       base, parsec
+  other-modules:       AssemblerSpec
+                       -- outros pacotes necessários
+  default-language:    Haskell2010
+
+test-suite assembler-tests
+  type:                exitcode-stdio-1.0
+  main-is:             AssemblerTests.hs
+  hs-source-dirs:      test, src
+  build-depends:       base, HUnit
+  default-language:    Haskell2010
+  other-modules:       AssemblerSpec Assembler
+
+-- test-suite parser-tests
+--   type:                exitcode-stdio-1.0
+--   main-is:             ParserTests.hs
+--   hs-source-dirs:      test
+--   build-depends:       base, pfl-proj02, HUnit
+--   default-language:    Haskell2010
